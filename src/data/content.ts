@@ -189,6 +189,12 @@ export const portfolioData = {
   ],
   achievements: [
     {
+      title: "IEEE WIE Big Idea Pitch Competition 2026",
+      date: "July 2026",
+      description: "Finalist in the Best Impact Pitch category for Pharmaco, an AI-powered drug safety reporting platform",
+      featured: true
+    },
+    {
       title: "Buildathon Organised By RVCE",
       date: "20th June 2026",
       description: "Secured 1st place among 31 teams in a buildathon organised by RVCE",
