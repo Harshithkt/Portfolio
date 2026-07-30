@@ -52,7 +52,7 @@ function MouseGlow() {
 
 function App() {
   return (
-    <div style={{ fontFamily: "'Inter', 'SF Pro Display', 'Segoe UI', sans-serif", position: "relative" }}>
+    <div style={{ fontFamily: "'Geist', sans-serif", position: "relative" }}>
       <MouseGlow />
       <Navbar />
       <main style={{ position: "relative", zIndex: 1 }}>

@@ -63,6 +63,47 @@ export const portfolioData = {
   ],
   projects: [
     {
+      title: "PharmacoRAG — Multi-Agent Pharmacovigilance Intelligence System",
+      year: "2026",
+      tech: ["Node.js", "React", "Vite", "ChromaDB", "Groq", "Xenova", "Transformers.js"],
+      bullets: [
+        "Built for AgentCon 2026: A production-grade multi-agent RAG system that transforms fragmented adverse drug event data from 4 regulatory sources into actionable, regulatory-grade intelligence.",
+        "Deployed 6 specialized AI agents (Orchestrator, Query Understanding, Retrieval, Synthesis, Citation, Triage) orchestrated sequentially with graceful error handling and cross-agent context passing.",
+        "Achieved zero-cost embedding infrastructure using Xenova/all-MiniLM-L6-v2 running locally; integrated Groq free-tier LLM (70B model) for reasoning without external API costs for embeddings or data privacy concerns."
+      ],
+      metrics: [
+        { label: "AI Agents", value: "6" },
+        { label: "Data Sources Ingested", value: "4" },
+        { label: "ChromaDB Collections", value: "4" },
+        { label: "LLM Context Window", value: "70B" },
+        { label: "Retrieval Sources (Parallel)", value: "FDA + CDSCO + WHO + Labels" },
+        { label: "Safety-Critical Escalations", value: "Real-time" },
+        { label: "Frontend Components", value: "5+" }
+      ],
+      featured: true,
+      github: "https://github.com/Harshithkt/Phrmaco_Rag" // Add repository URL when available
+    },
+    {
+      title: "AssetFlow — Enterprise Asset & Resource Management ERP",
+      year: "2026",
+      tech: ["React", "Vite", "TailwindCSS", "Node.js", "Express", "MySQL", "JWT", "SMTP"],
+      bullets: [
+        "Full-stack ERP platform built in 8 hours, consolidating hardware inventory and shared resource management into a unified database, eliminating fragmented spreadsheets and manual logs.",
+        "Implemented role-based access control (RBAC) across 4 roles with dynamic, context-aware dashboards tailored to each user scope; supports 5-stage asset lifecycle with soft-delete audit preservation.",
+        "Built enterprise-grade security with double-allocation checks, two-person sign-off constraints for $1,000+ assets, concurrent session monitoring, and full transaction-level audit trails."
+      ],
+      metrics: [
+        { label: "Build Time", value: "8 hours" },
+        { label: "Roles Implemented", value: "4" },
+        { label: "Asset Lifecycle Stages", value: "5" },
+        { label: "High-Value Threshold", value: "$1,000+" },
+        { label: "Dashboard Visualizations", value: "3+" },
+        { label: "API Endpoints", value: "15+" }
+      ],
+      featured: true,
+      github: "https://github.com/Harshithkt/odoo-hackathon" // Add repository URL when available
+    },
+    {
       title: "Vision-Aid — AI-Powered Currency Detection System",
       year: "2026",
       tech: ["YOLOv8", "Faster R-CNN", "MobileNetV2", "Python"],
@@ -76,7 +117,7 @@ export const portfolioData = {
         { label: "Faster R-CNN mAP@50", value: "100%" }
       ],
       featured: true,
-      github: "" // Intentionally empty, can be added later
+      github: "https://github.com/Harshithkt/internship" // Intentionally empty, can be added later
     },
     {
       title: "NeuroMatch AI",

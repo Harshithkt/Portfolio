@@ -215,9 +215,9 @@ function CoordinatesSVG() {
       <line x1="20" y1="200" x2="200" y2="200" stroke="var(--brand-500)" strokeWidth="1.5" />
       <path d="M 20 200 Q 70 80 130 140 T 200 40" stroke="var(--brand-600)" strokeWidth="2.5" strokeDasharray="3 3" fill="none" />
       <circle cx="130" cy="140" r="5" fill="var(--brand-600)" />
-      <text x="140" y="145" fontFamily="monospace" fontSize="11" fill="var(--text-tertiary)">loss: 0.04</text>
+      <text x="140" y="145" fontFamily="'Geist Mono', monospace" fontSize="11" fill="var(--text-tertiary)">loss: 0.04</text>
       <circle cx="200" cy="40" r="5" fill="var(--brand-600)" />
-      <text x="170" y="30" fontFamily="monospace" fontSize="11" fill="var(--brand-700)" fontWeight="bold">mAP: 99.48%</text>
+      <text x="170" y="30" fontFamily="'Geist Mono', monospace" fontSize="11" fill="var(--brand-700)" fontWeight="bold">mAP: 99.48%</text>
       {/* Grid lines */}
       <line x1="20" y1="80" x2="200" y2="80" stroke="var(--border-default)" strokeWidth="1" strokeDasharray="8 8" />
       <line x1="20" y1="140" x2="200" y2="140" stroke="var(--border-default)" strokeWidth="1" strokeDasharray="8 8" />
@@ -237,15 +237,15 @@ function TerminalBracketsSVG() {
       <circle cx="30" cy="25" r="4" fill="var(--brand-600)" />
       <circle cx="45" cy="25" r="4" fill="var(--brand-400)" />
       <circle cx="60" cy="25" r="4" fill="var(--border-strong)" />
-      <text x="110" y="28" fontFamily="monospace" fontSize="11" fill="var(--text-tertiary)">train.py</text>
+      <text x="110" y="28" fontFamily="'Geist Mono', monospace" fontSize="11" fill="var(--text-tertiary)">train.py</text>
       
       {/* Code Text lines */}
-      <text x="25" y="70" fontFamily="monospace" fontSize="13" fill="var(--brand-600)" fontWeight="bold">import torch</text>
-      <text x="25" y="95" fontFamily="monospace" fontSize="13" fill="var(--text-secondary)">model = YOLO("yolov8x.pt")</text>
-      <text x="25" y="120" fontFamily="monospace" fontSize="13" fill="var(--text-secondary)">results = model.train(</text>
-      <text x="45" y="145" fontFamily="monospace" fontSize="13" fill="var(--brand-700)">data="maternal_health.yaml",</text>
-      <text x="45" y="170" fontFamily="monospace" fontSize="13" fill="var(--brand-700)">epochs=100, imgsz=640</text>
-      <text x="220" y="170" fontFamily="monospace" fontSize="13" fill="var(--text-secondary)">)</text>
+      <text x="25" y="70" fontFamily="'Geist Mono', monospace" fontSize="13" fill="var(--brand-600)" fontWeight="bold">import torch</text>
+      <text x="25" y="95" fontFamily="'Geist Mono', monospace" fontSize="13" fill="var(--text-secondary)">model = YOLO("yolov8x.pt")</text>
+      <text x="25" y="120" fontFamily="'Geist Mono', monospace" fontSize="13" fill="var(--text-secondary)">results = model.train(</text>
+      <text x="45" y="145" fontFamily="'Geist Mono', monospace" fontSize="13" fill="var(--brand-700)">data="maternal_health.yaml",</text>
+      <text x="45" y="170" fontFamily="'Geist Mono', monospace" fontSize="13" fill="var(--brand-700)">epochs=100, imgsz=640</text>
+      <text x="220" y="170" fontFamily="'Geist Mono', monospace" fontSize="13" fill="var(--text-secondary)">)</text>
     </svg>
   );
 }
@@ -332,7 +332,7 @@ function RadarScanSVG() {
       {/* Target markers */}
       <circle cx="210" cy="90" r="5" fill="var(--brand-600)" />
       <path d="M 205 90 L 215 90 M 210 85 L 210 95" stroke="var(--brand-600)" strokeWidth="1.5" />
-      <text x="220" y="86" fontFamily="monospace" fontSize="10" fill="var(--brand-700)" fontWeight="bold">Target detected</text>
+      <text x="220" y="86" fontFamily="'Geist Mono', monospace" fontSize="10" fill="var(--brand-700)" fontWeight="bold">Target detected</text>
 
       <circle cx="90" cy="180" r="4" fill="var(--brand-500)" opacity="0.6" />
     </svg>
@@ -355,7 +355,7 @@ function ViewfinderSVG() {
       {/* Grid lines inside */}
       <rect x="25" y="25" width="150" height="150" stroke="var(--brand-500)" strokeWidth="1" strokeDasharray="4 6" />
       <circle cx="100" cy="100" r="6" fill="var(--brand-600)" />
-      <text x="112" y="104" fontFamily="monospace" fontSize="11" fill="var(--brand-700)">conf: 0.99</text>
+      <text x="112" y="104" fontFamily="'Geist Mono', monospace" fontSize="11" fill="var(--brand-700)">conf: 0.99</text>
     </svg>
   );
 }
@@ -386,8 +386,8 @@ function ScatterPlotSVG() {
       {points.map(([x, y], i) => (
         <circle key={i} cx={x} cy={y} r={i % 4 === 0 ? 5.5 : 4} fill={i % 3 === 0 ? "var(--brand-600)" : "var(--brand-400)"} />
       ))}
-      <text x="210" y="195" fontFamily="monospace" fontSize="10" fill="var(--text-tertiary)">Epoch</text>
-      <text x="25" y="15" fontFamily="monospace" fontSize="10" fill="var(--text-tertiary)">mAP</text>
+      <text x="210" y="195" fontFamily="'Geist Mono', monospace" fontSize="10" fill="var(--text-tertiary)">Epoch</text>
+      <text x="25" y="15" fontFamily="'Geist Mono', monospace" fontSize="10" fill="var(--text-tertiary)">mAP</text>
     </svg>
   );
 }
@@ -407,25 +407,25 @@ function AlgorithmNodesSVG() {
       {/* Nodes */}
       {/* Root */}
       <circle cx="130" cy="30" r="14" fill="var(--bg-primary)" stroke="var(--brand-600)" strokeWidth="2.5" />
-      <text x="126" y="34" fontFamily="monospace" fontSize="11" fill="var(--brand-700)" fontWeight="bold">98</text>
+      <text x="126" y="34" fontFamily="'Geist Mono', monospace" fontSize="11" fill="var(--brand-700)" fontWeight="bold">98</text>
 
       {/* Layer 1 */}
       <circle cx="70" cy="80" r="12" fill="var(--bg-primary)" stroke="var(--brand-500)" strokeWidth="2" />
-      <text x="66" y="84" fontFamily="monospace" fontSize="10" fill="var(--brand-600)">62</text>
+      <text x="66" y="84" fontFamily="'Geist Mono', monospace" fontSize="10" fill="var(--brand-600)">62</text>
       <circle cx="190" cy="80" r="12" fill="var(--bg-primary)" stroke="var(--brand-500)" strokeWidth="2" />
-      <text x="186" y="84" fontFamily="monospace" fontSize="10" fill="var(--brand-600)">35</text>
+      <text x="186" y="84" fontFamily="'Geist Mono', monospace" fontSize="10" fill="var(--brand-600)">35</text>
 
       {/* Layer 2 */}
       {[[40, "E"], [100, "M"], [160, "H"], [220, "D"]].map(([x, char], i) => (
         <g key={i}>
           <circle cx={Number(x)} cy="130" r="10" fill="var(--surface-secondary)" stroke="var(--brand-400)" strokeWidth="1.5" />
-          <text x={Number(x) - 4} y="134" fontFamily="monospace" fontSize="9" fill="var(--text-secondary)" fontWeight="bold">{char}</text>
+          <text x={Number(x) - 4} y="134" fontFamily="'Geist Mono', monospace" fontSize="9" fill="var(--text-secondary)" fontWeight="bold">{char}</text>
         </g>
       ))}
 
       {/* Braces code accent overlay */}
-      <text x="10" y="175" fontFamily="monospace" fontSize="12" fill="var(--brand-700)">{`solve(easy, med, hard)`}</text>
-      <text x="10" y="195" fontFamily="monospace" fontSize="12" fill="var(--text-tertiary)">{`// active_days = 87`}</text>
+      <text x="10" y="175" fontFamily="'Geist Mono', monospace" fontSize="12" fill="var(--brand-700)">{`solve(easy, med, hard)`}</text>
+      <text x="10" y="195" fontFamily="'Geist Mono', monospace" fontSize="12" fill="var(--text-tertiary)">{`// active_days = 87`}</text>
     </svg>
   );
 }
@@ -521,8 +521,8 @@ function GitHubNodesSVG() {
       <circle cx="120" cy="30" r="12" stroke="var(--brand-400)" strokeWidth="1" className="animate-ping" style={{ transformOrigin: `120px 30px`, animationDuration: "3s" }} />
 
       {/* Decoration text */}
-      <text x="135" y="34" fontFamily="monospace" fontSize="10" fill="var(--text-tertiary)" fontWeight="bold">main</text>
-      <text x="165" y="154" fontFamily="monospace" fontSize="9" fill="var(--brand-700)">feat/stats</text>
+      <text x="135" y="34" fontFamily="'Geist Mono', monospace" fontSize="10" fill="var(--text-tertiary)" fontWeight="bold">main</text>
+      <text x="165" y="154" fontFamily="'Geist Mono', monospace" fontSize="9" fill="var(--brand-700)">feat/stats</text>
     </svg>
   );
 }
@@ -574,8 +574,8 @@ function DataStructureSVG() {
       <line x1="155" y1="135" x2="170" y2="135" stroke="var(--brand-600)" strokeWidth="1.5" strokeDasharray="2 2" />
 
       {/* Abstract Query Overlay */}
-      <text x="80" y="170" fontFamily="monospace" fontSize="12" fill="var(--brand-700)">SELECT *</text>
-      <text x="80" y="190" fontFamily="monospace" fontSize="12" fill="var(--text-tertiary)">FROM data</text>
+      <text x="80" y="170" fontFamily="'Geist Mono', monospace" fontSize="12" fill="var(--brand-700)">SELECT *</text>
+      <text x="80" y="190" fontFamily="'Geist Mono', monospace" fontSize="12" fill="var(--text-tertiary)">FROM data</text>
     </svg>
   );
 }
@@ -601,7 +601,7 @@ function MergePRSVG() {
       
       <circle cx="100" cy="50" r="14" stroke="var(--brand-400)" strokeWidth="1" className="animate-ping" style={{ transformOrigin: `100px 50px`, animationDuration: "2.5s" }} />
       
-      <text x="115" y="54" fontFamily="monospace" fontSize="11" fill="var(--brand-700)" fontWeight="bold">Merged</text>
+      <text x="115" y="54" fontFamily="'Geist Mono', monospace" fontSize="11" fill="var(--brand-700)" fontWeight="bold">Merged</text>
     </svg>
   );
 }
@@ -664,7 +664,7 @@ function BinaryRainSVG() {
       {[20, 50, 80, 110, 140].map((x, col) => (
         <g key={col} opacity={0.3 + (col % 3) * 0.2}>
           {[20, 50, 80, 110, 140, 170].map((y, row) => (
-            <text key={row} x={x} y={y} fontFamily="monospace" fontSize="14" fill="var(--brand-600)" fontWeight="bold" opacity={1 - (row * 0.15)}>
+            <text key={row} x={x} y={y} fontFamily="'Geist Mono', monospace" fontSize="14" fill="var(--brand-600)" fontWeight="bold" opacity={1 - (row * 0.15)}>
               {Math.random() > 0.5 ? "1" : "0"}
             </text>
           ))}

@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { label: "Research", href: "#research" },
   { label: "LeetCode", href: "#leetcode" },
   { label: "Awards", href: "#achievements" },
+  { label: "GitHub", href: "#github" }
 ];
 
 export function Navbar() {

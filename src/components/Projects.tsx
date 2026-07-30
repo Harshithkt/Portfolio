@@ -54,11 +54,40 @@ export function Projects() {
 
               <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-6">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono px-2 py-1 rounded-md" style={{ backgroundColor: "rgba(255,255,255,0.2)", color: "#fff" }}>
-                      ⭐ Featured
-                    </span>
-                    <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.7)" }}>{project.year}</span>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-mono px-2.5 py-1 rounded-md font-medium" style={{ backgroundColor: "rgba(255,255,255,0.2)", color: "#fff" }}>
+                        ⭐ Featured
+                      </span>
+                      <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.75)" }}>{project.year}</span>
+                    </div>
+                    {project.github && (
+                      <a
+                        href={project.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium transition-all duration-200 shadow-sm"
+                        style={{
+                          backgroundColor: "rgba(255, 255, 255, 0.2)",
+                          color: "#FFFFFF",
+                          border: "1px solid rgba(255, 255, 255, 0.35)",
+                          backdropFilter: "blur(6px)"
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(255, 255, 255, 0.35)";
+                          (e.currentTarget as HTMLElement).style.borderColor = "rgba(255, 255, 255, 0.6)";
+                          (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(255, 255, 255, 0.2)";
+                          (e.currentTarget as HTMLElement).style.borderColor = "rgba(255, 255, 255, 0.35)";
+                          (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+                        }}
+                      >
+                        <GithubIcon className="w-4 h-4 text-white" />
+                        <span>Code</span>
+                      </a>
+                    )}
                   </div>
                   <h3 className="text-2xl md:text-3xl font-bold text-white leading-tight">{project.title}</h3>
                   <ul className="space-y-3">
