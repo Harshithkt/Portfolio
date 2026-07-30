@@ -3,6 +3,7 @@ import { motion, useInView, type Variants } from "framer-motion";
 import { portfolioData } from "../data/content";
 import { BoldText } from "./BoldText";
 import { ResearchIllustration } from "./TechIllustrations";
+import { ExternalLinkIcon } from "./Icons";
 
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 20 },
@@ -65,16 +66,41 @@ export function Research() {
                 </div>
 
                 <div className="flex-1 space-y-3">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h3 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
-                      {pub.venue}
-                    </h3>
-                    {pub.badges.map((badge, bi) => (
-                      <span key={bi} className="text-xs font-mono px-2.5 py-1 rounded-full"
-                        style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)", border: "1px solid var(--brand-200)" }}>
-                        {badge}
-                      </span>
-                    ))}
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <h3 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
+                        {pub.venue}
+                      </h3>
+                      {pub.badges.map((badge, bi) => (
+                        <span key={bi} className="text-xs font-mono px-2.5 py-1 rounded-full"
+                          style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)", border: "1px solid var(--brand-200)" }}>
+                          {badge}
+                        </span>
+                      ))}
+                    </div>
+                    {pub.url && (
+                      <a
+                        href={pub.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono font-medium transition-all duration-200"
+                        style={{
+                          backgroundColor: "var(--brand-500)",
+                          color: "#ffffff"
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLElement).style.backgroundColor = "var(--brand-600)";
+                          (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLElement).style.backgroundColor = "var(--brand-500)";
+                          (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
+                        }}
+                      >
+                        <ExternalLinkIcon className="w-3.5 h-3.5" />
+                        <span>View Paper</span>
+                      </a>
+                    )}
                   </div>
                   <p className="text-sm font-medium" style={{ color: "var(--brand-600)" }}>{pub.role}</p>
                   <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>

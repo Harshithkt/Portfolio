@@ -114,7 +114,7 @@ export const portfolioData = {
       ],
       metrics: [
         { label: "YOLOv8 mAP@50", value: "99.48%" },
-        { label: "Faster R-CNN mAP@50", value: "100%" }
+        { label: "Faster R-CNN mAP@50", value: "99.5%" }
       ],
       featured: true,
       github: "https://github.com/Harshithkt/internship" // Intentionally empty, can be added later
@@ -177,7 +177,8 @@ export const portfolioData = {
       venue: "IEEE ICITSIF 2026",
       role: "Research Paper Presenter",
       badges: ["IEEE Xplore Publication"],
-      description: "Presented \"Enhanced DDoS Attack Detection Leveraging Sequential and Anomaly Learning Models,\" a hybrid Random Forest + LSTM + Autoencoder approach reaching 99.7% accuracy on the CICDDoS2019 dataset."
+      description: "Presented \"Enhanced DDoS Attack Detection Leveraging Sequential and Anomaly Learning Models,\" a hybrid Random Forest + LSTM + Autoencoder approach reaching 99.7% accuracy on the CICDDoS2019 dataset.",
+      url: "https://ieeexplore.ieee.org/document/11608898/"
     },
     {
       venue: "Mi-IRICT 2025",
