@@ -170,7 +170,136 @@ export const portfolioData = {
       ],
       featured: false,
       github: "https://github.com/Harshithkt/smart-complaint-management-system"
-    }
+    },
+    {
+  title: "Voice Conversational Layer",
+  year: "2026",
+  tech: ["Python", "Whisper Large V3 Turbo", "MLX", "Kokoro-82M", "WebSockets", "VAD"],
+
+  bullets: [
+
+    "Fully local hear-and-speak conversational layer with Whisper Large V3 Turbo for speech-to-text and Kokoro-82M for speech synthesis, requiring no API keys, network access, or per-minute costs.",
+
+    "Implemented adaptive energy-based endpointing with 300ms pre-roll and 700ms silence hangover, plus optional headphone-based barge-in that cancels the agent mid-response after 160ms of sustained speech.",
+
+    "Built sentence-level TTS streaming, hallucination filtering, echo-loop detection, typed input, and half-duplex audio control to deliver reliable real-time voice conversations.",
+
+  ],
+
+  metrics: [
+
+    { label: "End-to-end latency", value: "663ms" },
+    { label: "STT latency", value: "370–450ms" },
+    { label: "TTS first audio", value: "210–350ms" }
+
+  ],
+
+  featured: true,
+  github: "https://github.com/Harshithkt/Conversational_layer"
+},
+{
+  title: "Autonomous arXiv Paper Digest & QA Agent",
+  year: "2026",
+  tech: ["Python", "LangGraph", "FastAPI", "React", "ChromaDB", "SQLite", "PyMuPDF", "Sentence Transformers", "Cross-Encoder", "Nebius"],
+
+  bullets: [
+
+    "Built an autonomous research agent that searches arXiv, selects relevant papers, downloads and parses full PDFs, indexes them locally, generates structured research briefings, and answers follow-up questions with page-level citations.",
+
+    "Designed explicit 13-node research and 7-node QA LangGraph state machines with typed shared state, cache reuse, paper-level fallback routing, relevance gates, and persistent SQLite sessions.",
+
+    "Implemented multi-layer hallucination prevention using local embeddings, cross-encoder re-ranking, deterministic numeric/page/acronym validation, Pydantic output validation, and an LLM refusal path when retrieved evidence is insufficient.",
+
+  ],
+
+  metrics: [
+
+    { label: "Research graph nodes", value: "13" },
+    { label: "QA graph nodes", value: "7" },
+    { label: "QA similarity threshold", value: "0.30" }
+
+  ],
+
+  featured: true,
+  github : "https://github.com/Harshithkt/arXiv_paper_digest"
+},
+{
+  title: "LabelLens",
+  year: "2026",
+  tech: ["React", "FastAPI", "Python", "Nebius VLM", "PaddleOCR", "Tesseract", "SHA-256", "SQLite", "YAML"],
+
+  bullets: [
+
+    "Built an enforcement-focused Legal Metrology platform that photographs packaged commodities, validates image quality, extracts English or Hindi declarations, evaluates mandatory requirements against version-locked Legal Metrology rules, and produces explainable GO / FIX / REVIEW outcomes.",
+
+    "Implemented tamper-evident evidence management using SHA-256 fingerprints and an append-only hash-chained ledger, with prosecution evidence dockets containing clause citations, image crops, integrity proofs, and draft s.63(4) BSA certificates.",
+
+    "Developed risk-ranked enforcement intelligence that aggregates repeated violations by manufacturer, packer, or importer and combines severity, repeat contraventions, and recency to prioritize inspections.",
+
+  ],
+
+  metrics: [
+
+    { label: "Languages supported", value: "2" },
+    { label: "Rule versions", value: "2" },
+    { label: "Evidence integrity", value: "SHA-256" }
+
+  ],
+
+  featured: true,
+  github: "https://github.com/Harshithkt/SIH_Compilance"
+},
+{
+  title: "DepRiskGuard",
+  year: "2026",
+  tech: ["Python", "FastAPI", "React", "LangChain", "GitHub REST API", "npm Registry", "OSV.dev", "OpenAI", "Anthropic", "Nebius"],
+
+  bullets: [
+
+    "Built a dependency intelligence platform that analyzes package.json files and forecasts which dependencies are likely to become problematic over the next 6 months using npm, GitHub, OSV, release, maintenance, vulnerability, and community-health signals.",
+
+    "Designed a deterministic 0–100 baseline risk engine with transparent scoring, followed by a bounded LLM adjustment of at most ±15 points, ensuring every package score remains explainable and reproducible.",
+
+    "Added repository health and open-source adoption analysis across maintenance, community, security, governance, integration, documentation, stability, and safety pillars, with verified replacement recommendations checked against the npm registry.",
+
+  ],
+
+  metrics: [
+
+    { label: "Risk forecast", value: "6 months" },
+    { label: "Risk score", value: "0–100" },
+    { label: "LLM adjustment", value: "±15 max" }
+
+  ],
+
+  github: "https://github.com/Harshithkt/DepRiskGuard",
+  featured: true
+},{
+  title: "PR Review Agent",
+  year: "2026",
+  tech: ["Python", "LangChain", "Claude", "GitHub REST API", "GitHub GraphQL API", "Docker", "GitHub Actions"],
+
+  bullets: [
+
+    "Built an autonomous GitHub pull-request review agent using Claude and LangChain that fetches PR diffs, metadata, files, and CI status, identifies code issues, posts inline review comments, and submits a final review.",
+
+    "Implemented six GitHub tools with deterministic diff filtering, severity gates, configurable review rules, duplicate-comment prevention, self-review handling, and fallback submission when GitHub rejects inline anchors.",
+
+    "Integrated the reviewer into GitHub Actions for automatic execution on pull-request creation and updates, with idempotent re-reviews that detect previously reviewed commits and avoid duplicate findings.",
+
+  ],
+
+  metrics: [
+
+    { label: "GitHub tools", value: "6" },
+    { label: "Agent iterations", value: "6 max" },
+    { label: "Review automation", value: "GitHub Actions" }
+
+  ],
+
+  featured: true,
+  github: "https://github.com/Harshithkt/pr-review-agent"
+}
   ],
   research: [
     {
