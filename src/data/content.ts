@@ -41,6 +41,26 @@ export const portfolioData = {
   ],
   experience: [
     {
+  role: "AI/ML Intern",
+
+  company: "AiKart, Remote",
+
+  date: "Aug 2026 – Present",
+
+  bullets: [
+
+    "Building scalable AI agent systems using Python, LangChain, and LLM APIs, developing autonomous workflows for GitHub pull-request review, dependency risk analysis, and real-time voice interaction.",
+
+    "Developed an autonomous PR Review Agent using Claude, LangChain, GitHub REST/GraphQL APIs, Docker, and GitHub Actions to analyze code changes, detect issues, post inline comments, and automate pull-request reviews with idempotent re-review support.",
+
+    "Built DepRiskGuard, an AI-powered dependency intelligence platform using FastAPI, React, npm, GitHub, and OSV signals with deterministic risk scoring, bounded LLM reasoning, repository health analysis, and verified package replacement recommendations.",
+
+    "Engineered a fully local voice conversational layer using Whisper Large V3 Turbo, MLX, Kokoro-82M, WebSockets, and adaptive VAD, implementing endpointing, barge-in, hallucination filtering, echo-loop prevention, and sentence-level TTS streaming with 663ms end-to-end latency."
+
+  ]
+
+},
+    {
       role: "Research & Development Intern",
       company: "IEEE Bangalore Section, Bengaluru",
       date: "Jan 2025 – Present",
@@ -51,6 +71,7 @@ export const portfolioData = {
         "Built training and evaluation pipelines using TensorFlow, Detectron2, YOLOv8, and Weights & Biases."
       ]
     },
+
     {
       role: "AI & Data Analytics Intern",
       company: "Shell, Remote",
