@@ -1,290 +1,137 @@
-import { useRef, useEffect, useState } from "react";
-import { motion, useInView, type Variants } from "framer-motion";
-import { ExternalLink, Flame, CalendarDays, Code2, Zap } from "lucide-react";
-import { LeetCodeIllustration } from "./TechIllustrations";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
+import { CalendarDays, Flame } from "lucide-react";
+import { SiLeetcode } from "react-icons/si";
+import { useCountUp } from "../hooks/useCountUp";
+import { fetchJson } from "../utils/fetchJson";
+import { reveal } from "../utils/motion";
+import { PanelHeader } from "./ui";
 
-const INITIAL_STATS = {
-  profileUrl: "https://leetcode.com/u/UrZX28YgRh/",
-  totalSolved: 98,
-  easy: 62,
-  medium: 35,
-  hard: 1,
-  totalActiveDays: 87,
-  streak: 13,
+const USERNAME = "UrZX28YgRh";
+const PROFILE_URL = `https://leetcode.com/u/${USERNAME}/`;
+const API_BASE = `https://alfa-leetcode-api.onrender.com/${USERNAME}`;
+
+// Shown until the live API responds (it is rate-limited and sometimes unavailable)
+const FALLBACK_STATS = {
+  totalSolved: 171,
+  easy: 90,
+  medium: 76,
+  hard: 5,
+  totalActiveDays: 157,
+  maxStreak: 87,
 };
 
-function useCountUp(target: number, inView: boolean, duration = 1400) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    if (!inView) return;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      setVal(Math.round(ease * target));
-      if (p < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }, [inView, target, duration]);
-  return val;
+interface SolvedResponse {
+  solvedProblem?: number;
+  easySolved?: number;
+  mediumSolved?: number;
+  hardSolved?: number;
 }
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 28 },
-  show: (i: number) => ({
-    opacity: 1, y: 0,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: i * 0.07 }
-  })
-};
+interface CalendarResponse {
+  totalActiveDays?: number;
+  streak?: number;
+}
 
-export function LeetCode() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-100px" });
-
-  const [stats, setStats] = useState(INITIAL_STATS);
+export function LeetCodeCard() {
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const [stats, setStats] = useState(FALLBACK_STATS);
 
   useEffect(() => {
-    async function fetchStats() {
-      try {
-        const [solvedRes, calendarRes] = await Promise.all([
-          fetch("https://alfa-leetcode-api.onrender.com/UrZX28YgRh/solved"),
-          fetch("https://alfa-leetcode-api.onrender.com/UrZX28YgRh/calendar")
-        ]);
+    const controller = new AbortController();
 
-        const solvedData = await solvedRes.json();
-        const calendarData = await calendarRes.json();
+    Promise.allSettled([
+      fetchJson<SolvedResponse>(`${API_BASE}/solved`, controller.signal),
+      fetchJson<CalendarResponse>(`${API_BASE}/calendar`, controller.signal),
+    ]).then(([solved, calendar]) => {
+      if (controller.signal.aborted) return;
+      setStats((prev) => {
+        const next = { ...prev };
+        if (solved.status === "fulfilled") {
+          next.totalSolved = solved.value.solvedProblem ?? prev.totalSolved;
+          next.easy = solved.value.easySolved ?? prev.easy;
+          next.medium = solved.value.mediumSolved ?? prev.medium;
+          next.hard = solved.value.hardSolved ?? prev.hard;
+        }
+        if (calendar.status === "fulfilled") {
+          next.totalActiveDays = calendar.value.totalActiveDays ?? prev.totalActiveDays;
+          next.maxStreak = calendar.value.streak ?? prev.maxStreak;
+        }
+        return next;
+      });
+    });
 
-        setStats(prev => ({
-          ...prev,
-          totalSolved: solvedData.solvedProblem ?? prev.totalSolved,
-          easy: solvedData.easySolved ?? prev.easy,
-          medium: solvedData.mediumSolved ?? prev.medium,
-          hard: solvedData.hardSolved ?? prev.hard,
-          totalActiveDays: calendarData.totalActiveDays ?? prev.totalActiveDays,
-          streak: calendarData.streak ?? prev.streak
-        }));
-      } catch (err) {
-        console.error("Failed to fetch LeetCode stats:", err);
-      }
-    }
-    fetchStats();
+    return () => controller.abort();
   }, []);
 
   const total = useCountUp(stats.totalSolved, inView);
-  const days  = useCountUp(stats.totalActiveDays, inView, 1200);
-  const streak = useCountUp(stats.streak, inView, 800);
+  const activeDays = useCountUp(stats.totalActiveDays, inView);
+  const streak = useCountUp(stats.maxStreak, inView, 900);
 
-  const circumference = 2 * Math.PI * 52;
-  const pct = stats.totalSolved / 3330;
-
-  const DIFFICULTY = [
-    { label: "Easy",   key: "easy",   count: stats.easy,   cap: 830,  color: "#16a34a", light: "#dcfce7", track: "#bbf7d0" },
-    { label: "Medium", key: "medium", count: stats.medium,  cap: 1740, color: "#ea580c", light: "#fff7ed", track: "#fed7aa" },
-    { label: "Hard",   key: "hard",   count: stats.hard,    cap: 760,  color: "#dc2626", light: "#fef2f2", track: "#fecaca" },
+  const levels = [
+    { label: "Easy", count: stats.easy, color: "var(--easy)" },
+    { label: "Medium", count: stats.medium, color: "var(--medium)" },
+    { label: "Hard", count: stats.hard, color: "var(--hard)" },
   ];
+  const levelTotal = levels.reduce((sum, level) => sum + level.count, 0) || 1;
 
   return (
-    <section id="leetcode" className="py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
-      <LeetCodeIllustration />
-      <div className="relative z-10 max-w-5xl mx-auto px-6" ref={ref}>
+    <motion.article ref={ref} {...reveal(0.08)} className="card flex flex-col p-6 sm:p-8">
+      <PanelHeader icon={SiLeetcode} title="LeetCode" subtitle="Problem solving" href={PROFILE_URL} linkLabel="Profile" />
 
-        {/* Section label + title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
-          className="mb-12 space-y-3"
-        >
-          <span className="text-xs font-mono font-semibold uppercase tracking-widest px-3 py-1 rounded-full"
-            style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)" }}>
-            Problem Solving
-          </span>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 className="text-3xl md:text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
-              LeetCode Progress
-            </h2>
-            <a
-              href={stats.profileUrl} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 self-start"
-              style={{ backgroundColor: "var(--brand-500)", color: "#fff", boxShadow: "0 4px 14px rgba(217,119,87,0.35)" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "var(--brand-600)"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "var(--brand-500)"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}
-            >
-              <Code2 className="w-4 h-4" />
-              View on LeetCode
-              <ExternalLink className="w-3.5 h-3.5 opacity-80" />
-            </a>
-          </div>
-        </motion.div>
+      <p className="mt-8 flex items-baseline gap-3">
+        <span className="text-5xl font-semibold tracking-tight text-ink tabular-nums">{total}</span>
+        <span className="text-muted">problems solved</span>
+      </p>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+      <div
+        role="img"
+        aria-label={`${stats.easy} easy, ${stats.medium} medium and ${stats.hard} hard problems solved`}
+        className="mt-6 flex h-2 gap-1 overflow-hidden rounded-full bg-surface-2"
+      >
+        {levels.map((level, i) => (
+          <motion.span
+            key={level.label}
+            className="h-full rounded-full"
+            style={{ backgroundColor: level.color, minWidth: level.count > 0 ? 6 : 0 }}
+            initial={{ width: 0 }}
+            animate={inView ? { width: `${(level.count / levelTotal) * 100}%` } : undefined}
+            transition={{ duration: 1, delay: 0.2 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+          />
+        ))}
+      </div>
 
-          {/* === HERO CARD: Total Solved === */}
-          <motion.div
-            custom={0} variants={fadeUp} initial="hidden" animate={inView ? "show" : "hidden"}
-            className="lg:col-span-1 relative overflow-hidden rounded-3xl p-8 flex flex-col items-center justify-center gap-6 min-h-[280px]"
-            style={{
-              background: "linear-gradient(145deg, var(--brand-500) 0%, var(--brand-700) 100%)",
-              boxShadow: "0 20px 50px rgba(217,119,87,0.3)"
-            }}
-          >
-            {/* Decorative rings */}
-            <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full border border-white/10" />
-            <div className="absolute -bottom-8 -left-8 w-36 h-36 rounded-full border border-white/10" />
+      <ul className="mt-5 grid grid-cols-3 gap-3">
+        {levels.map((level) => (
+          <li key={level.label}>
+            <p className="flex items-center gap-1.5 text-xs text-muted">
+              <span className="h-2 w-2 rounded-full" style={{ backgroundColor: level.color }} aria-hidden="true" />
+              {level.label}
+            </p>
+            <p className="mt-1 text-lg font-semibold text-ink tabular-nums">{level.count}</p>
+          </li>
+        ))}
+      </ul>
 
-            {/* SVG donut */}
-            <div className="relative">
-              <svg width="140" height="140" viewBox="0 0 120 120" className="-rotate-90">
-                <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="10" />
-                <motion.circle
-                  cx="60" cy="60" r="52" fill="none"
-                  stroke="rgba(255,255,255,0.9)"
-                  strokeWidth="10"
-                  strokeLinecap="round"
-                  strokeDasharray={circumference}
-                  initial={{ strokeDashoffset: circumference }}
-                  animate={inView ? { strokeDashoffset: circumference * (1 - pct) } : {}}
-                  transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
-                />
-              </svg>
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="text-4xl font-black text-white leading-none">{total}</span>
-                <span className="text-xs text-white/70 font-mono mt-1">/ 3330</span>
-              </div>
-            </div>
+      <div className="min-h-8 flex-1" aria-hidden="true" />
 
-            <div className="text-center">
-              <p className="text-white font-bold text-lg">Problems Solved</p>
-              <p className="text-white/60 text-sm mt-0.5 font-mono">Top {((stats.totalSolved / 3330) * 100).toFixed(1)}% completed</p>
-            </div>
-          </motion.div>
-
-          {/* === RIGHT COLUMN === */}
-          <div className="lg:col-span-2 flex flex-col gap-5">
-
-            {/* Streak + Active Days row */}
-            <div className="grid grid-cols-2 gap-5">
-              {/* Streak */}
-              <motion.div
-                custom={1} variants={fadeUp} initial="hidden" animate={inView ? "show" : "hidden"}
-                className="relative overflow-hidden rounded-2xl p-6"
-                style={{ backgroundColor: "var(--surface-primary)", border: "1px solid var(--border-light)", boxShadow: "var(--shadow-sm)" }}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: "linear-gradient(135deg, #fb923c, #dc2626)" }}>
-                    <Flame className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-xs font-mono px-2 py-1 rounded-lg"
-                    style={{ backgroundColor: "#fff7ed", color: "#ea580c" }}>
-                    Current
-                  </span>
-                </div>
-                <div className="text-5xl font-black leading-none mb-1" style={{ color: "var(--text-primary)" }}>
-                  {streak}
-                </div>
-                <p className="text-sm font-medium" style={{ color: "var(--text-tertiary)" }}>Day Streak 🔥</p>
-                {/* Flame bars decoration */}
-                <div className="absolute bottom-4 right-4 flex items-end gap-0.5 opacity-20">
-                  {[3,5,4,7,6,8,5].map((h, i) => (
-                    <div key={i} className="w-1.5 rounded-sm" style={{ height: `${h * 3}px`, backgroundColor: "#ea580c" }} />
-                  ))}
-                </div>
-              </motion.div>
-
-              {/* Active Days */}
-              <motion.div
-                custom={2} variants={fadeUp} initial="hidden" animate={inView ? "show" : "hidden"}
-                className="relative overflow-hidden rounded-2xl p-6"
-                style={{ backgroundColor: "var(--surface-primary)", border: "1px solid var(--border-light)", boxShadow: "var(--shadow-sm)" }}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: "linear-gradient(135deg, var(--brand-400), var(--brand-600))" }}>
-                    <CalendarDays className="w-5 h-5 text-white" />
-                  </div>
-                  <span className="text-xs font-mono px-2 py-1 rounded-lg"
-                    style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)" }}>
-                    Total
-                  </span>
-                </div>
-                <div className="text-5xl font-black leading-none mb-1" style={{ color: "var(--text-primary)" }}>
-                  {days}
-                </div>
-                <p className="text-sm font-medium" style={{ color: "var(--text-tertiary)" }}>Active Days</p>
-                {/* Calendar dots decoration */}
-                <div className="absolute bottom-4 right-4 grid grid-cols-5 gap-0.5 opacity-20">
-                  {Array.from({length: 15}).map((_, i) => (
-                    <div key={i} className="w-2 h-2 rounded-sm"
-                      style={{ backgroundColor: i < 10 ? "var(--brand-500)" : "var(--bg-tertiary)" }} />
-                  ))}
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Difficulty breakdown */}
-            <motion.div
-              custom={3} variants={fadeUp} initial="hidden" animate={inView ? "show" : "hidden"}
-              className="flex-1 rounded-2xl p-6"
-              style={{ backgroundColor: "var(--surface-primary)", border: "1px solid var(--border-light)", boxShadow: "var(--shadow-sm)" }}
-            >
-              <div className="flex items-center gap-2 mb-6">
-                <Zap className="w-4 h-4" style={{ color: "var(--brand-500)" }} />
-                <h3 className="text-sm font-semibold uppercase tracking-widest font-mono" style={{ color: "var(--text-tertiary)" }}>
-                  Difficulty Breakdown
-                </h3>
-              </div>
-
-              <div className="space-y-5">
-                {DIFFICULTY.map((d, i) => {
-                  const pct = Math.min((d.count / d.cap) * 100, 100);
-                  return (
-                    <div key={d.label} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: d.color }} />
-                          <span className="text-sm font-semibold" style={{ color: "var(--text-secondary)" }}>{d.label}</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs font-mono" style={{ color: "var(--text-tertiary)" }}>{d.count} / {d.cap}</span>
-                          <span
-                            className="text-sm font-bold tabular-nums w-8 text-right"
-                            style={{ color: d.color }}
-                          >
-                            {d.count}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: "var(--bg-tertiary)" }}>
-                        <motion.div
-                          className="h-full rounded-full"
-                          style={{ backgroundColor: d.color }}
-                          initial={{ width: 0 }}
-                          animate={inView ? { width: `${pct}%` } : { width: 0 }}
-                          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.3 + i * 0.12 }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* Bottom pill row */}
-              <div className="flex gap-3 mt-6 pt-5" style={{ borderTop: "1px solid var(--border-light)" }}>
-                {DIFFICULTY.map(d => (
-                  <div
-                    key={d.label}
-                    className="flex-1 text-center py-2.5 px-3 rounded-xl"
-                    style={{ backgroundColor: d.light, border: `1px solid ${d.track}` }}
-                  >
-                    <div className="text-xl font-extrabold" style={{ color: d.color }}>{d.count}</div>
-                    <div className="text-xs font-medium mt-0.5" style={{ color: d.color, opacity: 0.8 }}>{d.label}</div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+      <dl className="grid grid-cols-2 gap-4 border-t border-line pt-6">
+        <div className="flex items-center gap-3">
+          <Flame className="h-5 w-5 shrink-0 text-accent" aria-hidden="true" />
+          <div className="flex flex-col-reverse justify-end">
+            <dt className="text-xs text-muted">Max streak</dt>
+            <dd className="font-semibold text-ink tabular-nums">{streak} days</dd>
           </div>
         </div>
-      </div>
-    </section>
+        <div className="flex items-center gap-3">
+          <CalendarDays className="h-5 w-5 shrink-0 text-accent" aria-hidden="true" />
+          <div className="flex flex-col-reverse justify-end">
+            <dt className="text-xs text-muted">Active days</dt>
+            <dd className="font-semibold text-ink tabular-nums">{activeDays}</dd>
+          </div>
+        </div>
+      </dl>
+    </motion.article>
   );
 }

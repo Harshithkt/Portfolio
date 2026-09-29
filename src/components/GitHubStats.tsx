@@ -1,216 +1,181 @@
-import { useRef, useEffect, useState } from "react";
-import { motion, useInView, type Variants } from "framer-motion";
-import { ExternalLink, BookMarked, GitCommit, Terminal } from "lucide-react";
-import { GithubIcon } from "./Icons";
-import { GitHubIllustration } from "./TechIllustrations";
+import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
+import { FaGithub } from "react-icons/fa";
+import { useCountUp } from "../hooks/useCountUp";
+import { fetchJson } from "../utils/fetchJson";
+import { reveal } from "../utils/motion";
+import { PanelHeader } from "./ui";
 
-const INITIAL_STATS = {
-  profileUrl: "https://github.com/Harshithkt",
-  publicRepos: 26,
-  totalContributions: 62,
-  topLanguages: ["Python", "Java", "JavaScript"],
-};
+const USERNAME = "Harshithkt";
+const PROFILE_URL = `https://github.com/${USERNAME}`;
 
-function useCountUp(target: number, inView: boolean, duration = 1400) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    if (!inView) return;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min((now - start) / duration, 1);
-      const ease = 1 - Math.pow(1 - p, 3);
-      setVal(Math.round(ease * target));
-      if (p < 1) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  }, [inView, target, duration]);
-  return val;
+interface ContributionDay {
+  date: string; // YYYY-MM-DD
+  count: number;
+  level: 0 | 1 | 2 | 3 | 4;
 }
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 28 },
-  show: (i: number) => ({
-    opacity: 1, y: 0,
-    transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1], delay: i * 0.07 }
-  })
+interface ContributionsResponse {
+  total?: { lastYear?: number };
+  contributions?: ContributionDay[];
+}
+
+interface Repo {
+  language: string | null;
+  fork: boolean;
+}
+
+// Shown until the live APIs respond (unauthenticated GitHub requests are rate-limited)
+const FALLBACK_STATS = {
+  publicRepos: 42,
+  contributions: 175,
+  languages: ["Python", "Java", "JavaScript"],
+  days: null as ContributionDay[] | null,
 };
 
-export function GitHubStats() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-100px" });
+// GitHub's linguist colours for the languages likely to show up
+const LANGUAGE_COLORS: Record<string, string> = {
+  Python: "#3572A5",
+  JavaScript: "#f1e05a",
+  TypeScript: "#3178c6",
+  Java: "#b07219",
+  HTML: "#e34c26",
+  CSS: "#663399",
+  "Jupyter Notebook": "#DA5B0B",
+  C: "#555555",
+  "C++": "#f34b7d",
+  Shell: "#89e051",
+};
 
-  const [stats, setStats] = useState(INITIAL_STATS);
+export function GitHubCard() {
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const [stats, setStats] = useState(FALLBACK_STATS);
 
   useEffect(() => {
-    async function fetchGitHubStats() {
-      try {
-        const username = "Harshithkt";
-        
-        const [profileRes, contribRes, reposRes] = await Promise.all([
-          fetch(`https://api.github.com/users/${username}`),
-          fetch(`https://github-contributions-api.deno.dev/${username}.json`),
-          fetch(`https://api.github.com/users/${username}/repos?per_page=100`)
-        ]);
-        
-        const profileData = await profileRes.json();
-        const contribData = await contribRes.json();
-        const reposData = await reposRes.json();
+    const controller = new AbortController();
+    const { signal } = controller;
 
-        setStats(prev => {
-          let topLangs = prev.topLanguages;
-          if (Array.isArray(reposData)) {
-            const langs: Record<string, number> = {};
-            reposData.forEach(repo => {
-              if (repo.language) langs[repo.language] = (langs[repo.language] || 0) + 1;
-            });
-            const sorted = Object.entries(langs).sort((a, b) => b[1] - a[1]);
-            if (sorted.length > 0) {
-              topLangs = sorted.slice(0, 3).map(x => x[0]);
-            }
+    Promise.allSettled([
+      fetchJson<{ public_repos?: number }>(`https://api.github.com/users/${USERNAME}`, signal),
+      fetchJson<Repo[]>(`https://api.github.com/users/${USERNAME}/repos?per_page=100`, signal),
+      fetchJson<ContributionsResponse>(`https://github-contributions-api.jogruber.de/v4/${USERNAME}?y=last`, signal),
+    ]).then(([profile, repos, calendar]) => {
+      if (signal.aborted) return;
+      setStats((prev) => {
+        const next = { ...prev };
+        if (profile.status === "fulfilled") {
+          next.publicRepos = profile.value.public_repos ?? prev.publicRepos;
+        }
+        if (repos.status === "fulfilled" && Array.isArray(repos.value)) {
+          const counts = new Map<string, number>();
+          for (const repo of repos.value) {
+            if (repo.language && !repo.fork) counts.set(repo.language, (counts.get(repo.language) ?? 0) + 1);
           }
-          
-          return {
-            ...prev,
-            publicRepos: profileData.public_repos ?? prev.publicRepos,
-            totalContributions: contribData.totalContributions ?? prev.totalContributions,
-            topLanguages: topLangs,
-          };
-        });
-      } catch (err) {
-        console.error("Failed to fetch GitHub stats:", err);
-      }
-    }
-    fetchGitHubStats();
+          const top = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 4).map(([lang]) => lang);
+          if (top.length > 0) next.languages = top;
+        }
+        if (calendar.status === "fulfilled") {
+          next.contributions = calendar.value.total?.lastYear ?? prev.contributions;
+          if (calendar.value.contributions?.length) next.days = calendar.value.contributions;
+        }
+        return next;
+      });
+    });
+
+    return () => controller.abort();
   }, []);
 
-  const reposCount = useCountUp(stats.publicRepos, inView, 1200);
-  const contributionsCount = useCountUp(stats.totalContributions, inView, 1000);
+  const repos = useCountUp(stats.publicRepos, inView);
+  const contributions = useCountUp(stats.contributions, inView);
 
   return (
-    <section id="github" className="py-28 relative overflow-hidden" style={{ backgroundColor: "var(--surface-secondary)" }}>
-      {/* Decorative top border line */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--border-default)] to-transparent opacity-50" />
-      
-      <GitHubIllustration />
-      <div className="relative z-10 max-w-5xl mx-auto px-6" ref={ref}>
+    <motion.article ref={ref} {...reveal()} className="card flex flex-col p-6 sm:p-8">
+      <PanelHeader icon={FaGithub} title="GitHub" subtitle={`@${USERNAME}`} href={PROFILE_URL} linkLabel="Follow" />
 
-        {/* Section label + title */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
-          className="mb-12 space-y-3"
-        >
-          <span className="text-xs font-mono font-semibold uppercase tracking-widest px-3 py-1 rounded-full"
-            style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)" }}>
-            Open Source
-          </span>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <h2 className="text-3xl md:text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
-              GitHub Activity
-            </h2>
-            <a
-              href={stats.profileUrl} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all duration-200 self-start"
-              style={{ backgroundColor: "#24292f", color: "#fff", boxShadow: "0 4px 14px rgba(36,41,47,0.3)" }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "#1b1f23"; (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)"; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.backgroundColor = "#24292f"; (e.currentTarget as HTMLElement).style.transform = "translateY(0)"; }}
-            >
-              <GithubIcon className="w-4 h-4" />
-              Follow on GitHub
-              <ExternalLink className="w-3.5 h-3.5 opacity-80" />
-            </a>
-          </div>
-        </motion.div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Card 1: Public Repos */}
-          <motion.div
-            custom={0} variants={fadeUp} initial="hidden" animate={inView ? "show" : "hidden"}
-            className="relative overflow-hidden rounded-2xl p-8"
-            style={{ backgroundColor: "var(--surface-primary)", border: "1px solid var(--border-light)", boxShadow: "var(--shadow-sm)" }}
-          >
-            <div className="flex items-start justify-between mb-6">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg, #10b981, #047857)" }}>
-                <BookMarked className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <div className="text-5xl font-black leading-none mb-2" style={{ color: "var(--text-primary)" }}>
-              {reposCount}
-            </div>
-            <p className="text-base font-medium" style={{ color: "var(--text-tertiary)" }}>Public Repositories</p>
-            
-            {/* Background decoration */}
-            <div className="absolute -bottom-6 -right-6 opacity-5">
-              <BookMarked className="w-32 h-32" />
-            </div>
-          </motion.div>
-
-          {/* Card 2: Total Contributions */}
-          <motion.div
-            custom={1} variants={fadeUp} initial="hidden" animate={inView ? "show" : "hidden"}
-            className="relative overflow-hidden rounded-2xl p-8"
-            style={{ backgroundColor: "var(--surface-primary)", border: "1px solid var(--border-light)", boxShadow: "var(--shadow-sm)" }}
-          >
-            <div className="flex items-start justify-between mb-6">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}>
-                <GitCommit className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            <div className="text-5xl font-black leading-none mb-2" style={{ color: "var(--text-primary)" }}>
-              {contributionsCount}
-            </div>
-            <p className="text-base font-medium" style={{ color: "var(--text-tertiary)" }}>Yearly Contributions</p>
-            
-            {/* Background decoration */}
-            <div className="absolute -bottom-6 -right-6 opacity-5">
-              <GitCommit className="w-32 h-32" />
-            </div>
-          </motion.div>
-
-          {/* Card 3: Top Languages */}
-          <motion.div
-            custom={2} variants={fadeUp} initial="hidden" animate={inView ? "show" : "hidden"}
-            className="relative overflow-hidden rounded-2xl p-8 flex flex-col"
-            style={{ backgroundColor: "var(--surface-primary)", border: "1px solid var(--border-light)", boxShadow: "var(--shadow-sm)" }}
-          >
-            <div className="flex items-start justify-between mb-6">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center"
-                style={{ background: "linear-gradient(135deg, #8b5cf6, #6d28d9)" }}>
-                <Terminal className="w-6 h-6 text-white" />
-              </div>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 mb-3 mt-auto">
-              {stats.topLanguages.map(lang => (
-                <span key={lang} className="px-3 py-1.5 rounded-lg text-sm font-bold border transition-transform hover:-translate-y-0.5" 
-                  style={{ backgroundColor: "var(--brand-50)", color: "var(--brand-700)", borderColor: "var(--brand-200)" }}>
-                  {lang}
-                </span>
-              ))}
-            </div>
-            
-            <p className="text-base font-medium" style={{ color: "var(--text-tertiary)" }}>Most Used Languages</p>
-            
-            {/* Background decoration */}
-            <div className="absolute -bottom-6 -right-6 opacity-5">
-              <Terminal className="w-32 h-32" />
-            </div>
-          </motion.div>
+      <dl className="mt-8 grid grid-cols-2 gap-6">
+        <div className="flex flex-col-reverse justify-end gap-1">
+          <dt className="text-sm text-muted">Public repositories</dt>
+          <dd className="text-5xl font-semibold tracking-tight text-ink tabular-nums">{repos}</dd>
         </div>
-        
-        {/* Decorative commit timeline bar at bottom */}
-        <motion.div 
-          custom={3} variants={fadeUp} initial="hidden" animate={inView ? "show" : "hidden"}
-          className="mt-8 h-2 rounded-full w-full flex overflow-hidden opacity-80"
-          style={{ backgroundColor: "var(--bg-tertiary)" }}
-        >
-          <motion.div className="h-full bg-emerald-500" initial={{ width: 0 }} animate={inView ? { width: "30%" } : {}} transition={{ duration: 1, delay: 0.5 }} />
-          <motion.div className="h-full bg-amber-500" initial={{ width: 0 }} animate={inView ? { width: "45%" } : {}} transition={{ duration: 1, delay: 0.8 }} />
-          <motion.div className="h-full bg-purple-500" initial={{ width: 0 }} animate={inView ? { width: "25%" } : {}} transition={{ duration: 1, delay: 1.1 }} />
-        </motion.div>
+        <div className="flex flex-col-reverse justify-end gap-1">
+          <dt className="text-sm text-muted">Contributions, last 12 months</dt>
+          <dd className="text-5xl font-semibold tracking-tight text-ink tabular-nums">{contributions}</dd>
+        </div>
+      </dl>
+
+      {stats.days && (
+        <div className="mt-8">
+          <ContributionGraph days={stats.days} total={stats.contributions} />
+          <div className="mt-3 flex items-center justify-between text-xs text-subtle">
+            <span>Last 12 months</span>
+            <span className="flex items-center gap-1" aria-hidden="true">
+              Less
+              {[0, 1, 2, 3, 4].map((level) => (
+                <span key={level} className="h-2.5 w-2.5 rounded-[3px]" style={{ backgroundColor: `var(--heat-${level})` }} />
+              ))}
+              More
+            </span>
+          </div>
+        </div>
+      )}
+
+      <div className="min-h-8 flex-1" aria-hidden="true" />
+
+      <div className="border-t border-line pt-6">
+        <p className="text-xs text-muted">Most used languages</p>
+        <ul className="mt-3 flex flex-wrap gap-2">
+          {stats.languages.map((lang) => (
+            <li
+              key={lang}
+              className="inline-flex items-center gap-2 rounded-full border border-line bg-surface-2 px-3 py-1 text-sm text-ink"
+            >
+              <span
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: LANGUAGE_COLORS[lang] ?? "var(--subtle)" }}
+                aria-hidden="true"
+              />
+              {lang}
+            </li>
+          ))}
+        </ul>
       </div>
-    </section>
+    </motion.article>
+  );
+}
+
+const CELL = 10;
+const GAP = 3;
+const STEP = CELL + GAP;
+
+function ContributionGraph({ days, total }: { days: ContributionDay[]; total: number }) {
+  // Dates parse as UTC midnight; pad the first column so rows line up with weekdays
+  const offset = new Date(days[0].date).getUTCDay();
+  const weeks = Math.ceil((days.length + offset) / 7);
+
+  return (
+    <svg
+      viewBox={`0 0 ${weeks * STEP - GAP} ${7 * STEP - GAP}`}
+      role="img"
+      aria-label={`${total} GitHub contributions in the last 12 months`}
+      className="block h-auto w-full"
+    >
+      {days.map((day, i) => {
+        const slot = i + offset;
+        return (
+          <rect
+            key={day.date}
+            x={Math.floor(slot / 7) * STEP}
+            y={(slot % 7) * STEP}
+            width={CELL}
+            height={CELL}
+            rx={2.5}
+            style={{ fill: `var(--heat-${day.level})` }}
+          >
+            <title>{`${day.count} contribution${day.count === 1 ? "" : "s"} on ${day.date}`}</title>
+          </rect>
+        );
+      })}
+    </svg>
   );
 }

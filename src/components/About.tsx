@@ -1,90 +1,58 @@
-import { useRef } from "react";
-import { motion, useInView, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
+import { BrainCircuit, FlaskConical, Layers, ScanEye, type LucideIcon } from "lucide-react";
 import { portfolioData } from "../data/content";
-import harshithImg from "../assets/harshith.jpg";
+import { reveal } from "../utils/motion";
 import { BoldText } from "./BoldText";
-import { AboutIllustration } from "./TechIllustrations";
+import { Reveal, Section, SectionHeading } from "./ui";
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } }
+const FOCUS_ICONS: Record<string, LucideIcon> = {
+  vision: ScanEye,
+  agents: BrainCircuit,
+  fullstack: Layers,
+  research: FlaskConical,
 };
 
 export function About() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const { bio, focus } = portfolioData.about;
 
   return (
-    <section id="about" className="py-28" style={{ backgroundColor: "var(--bg-secondary)" }}>
-      <AboutIllustration />
-      <div className="relative z-10 max-w-6xl mx-auto px-6" ref={ref}>
-        <motion.div
-          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
-          initial="hidden"
-          animate={inView ? "show" : "hidden"}
-          className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center"
-        >
-          {/* Left: Text */}
-          <div className="space-y-8">
-            <motion.div variants={fadeUp}>
-              <span className="text-xs font-mono font-medium uppercase tracking-widest px-3 py-1 rounded-full"
-                style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)" }}>
-                About Me
-              </span>
-            </motion.div>
+    <Section id="about">
+      <div className="grid gap-x-20 gap-y-4 lg:grid-cols-[1fr_1.35fr]">
+        <SectionHeading
+          eyebrow="About"
+          title={
+            <>
+              Turning visual data into <em className="text-accent">meaningful decisions</em>
+            </>
+          }
+          className="lg:sticky lg:top-28 lg:mb-0 lg:self-start"
+        />
 
-            <motion.h2 variants={fadeUp} className="text-3xl md:text-4xl font-bold leading-tight" style={{ color: "var(--text-primary)" }}>
-              Turning visual data into<br />
-              <span style={{ color: "var(--brand-500)" }}>meaningful decisions</span>
-            </motion.h2>
+        <div>
+          <Reveal className="space-y-5 text-lg leading-relaxed text-pretty text-muted">
+            {bio.map((paragraph) => (
+              <p key={paragraph}>
+                <BoldText text={paragraph} />
+              </p>
+            ))}
+          </Reveal>
 
-            <div className="space-y-5">
-              {portfolioData.about.bio.map((para, i) => (
-                <motion.p key={i} variants={fadeUp} className="text-base leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                  <BoldText text={para} />
-                </motion.p>
-              ))}
-            </div>
-
-            {/* Quick stats */}
-            <motion.div variants={fadeUp} className="grid grid-cols-3 gap-4 pt-4">
-              {[
-                { num: "9.27", label: "CGPA" },
-                { num: "#14", label: "of 550+ students" },
-                { num: "2", label: "IEEE Papers" },
-              ].map((stat) => (
-                <div key={stat.label} className="text-center p-4 rounded-xl" style={{ backgroundColor: "var(--surface-primary)", border: "1px solid var(--border-light)", boxShadow: "var(--shadow-sm)" }}>
-                  <div className="text-2xl font-bold" style={{ color: "var(--brand-600)" }}>{stat.num}</div>
-                  <div className="text-xs mt-1" style={{ color: "var(--text-tertiary)" }}>{stat.label}</div>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-
-          {/* Right: Image */}
-          <motion.div variants={fadeUp} className="relative flex justify-center">
-            <div className="relative w-full max-w-sm">
-              <div
-                className="absolute inset-0 rounded-3xl rotate-3"
-                style={{ background: "linear-gradient(135deg, var(--brand-200), var(--brand-50))" }}
-              />
-              <img
-                src={harshithImg}
-                alt="Harshith KT"
-                className="relative rounded-2xl w-full object-cover"
-                style={{ boxShadow: "0 20px 40px rgba(217,119,87,0.2)" }}
-              />
-              {/* Floating tag */}
-              <div
-                className="absolute -bottom-4 left-1/2 -translate-x-1/2 whitespace-nowrap px-4 py-2 rounded-full text-xs font-medium font-mono"
-                style={{ backgroundColor: "var(--surface-primary)", border: "1px solid var(--border-light)", boxShadow: "var(--shadow-md)", color: "var(--brand-700)" }}
-              >
-                📍 Bengaluru, India
-              </div>
-            </div>
-          </motion.div>
-        </motion.div>
+          <ul className="mt-12 grid gap-4 sm:grid-cols-2">
+            {focus.map((area, i) => {
+              const Icon = FOCUS_ICONS[area.icon] ?? Layers;
+              return (
+                <motion.li key={area.title} {...reveal(i * 0.06)} className="card card-hover p-5">
+                  <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-accent-line bg-accent-soft text-accent">
+                    <Icon className="h-[18px] w-[18px]" aria-hidden="true" />
+                  </span>
+                  <h3 className="mt-4 font-semibold tracking-tight text-ink">{area.title}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-muted">{area.description}</p>
+                </motion.li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
-    </section>
+    </Section>
   );
 }

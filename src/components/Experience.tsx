@@ -1,101 +1,62 @@
-import { useRef } from "react";
-import { motion, useInView, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { portfolioData } from "../data/content";
+import { reveal } from "../utils/motion";
 import { BoldText } from "./BoldText";
-import { ExperienceIllustration } from "./TechIllustrations";
+import { Section, SectionHeading } from "./ui";
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } }
-};
+// "IEEE Bangalore Section, Bengaluru" -> ["IEEE Bangalore Section", "Bengaluru"]
+function splitCompany(company: string): [string, string | undefined] {
+  const i = company.lastIndexOf(", ");
+  return i === -1 ? [company, undefined] : [company.slice(0, i), company.slice(i + 2)];
+}
 
 export function Experience() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
   return (
-    <section id="experience" className="py-28" style={{ backgroundColor: "var(--bg-secondary)" }}>
-      <ExperienceIllustration />
-      <div className="relative z-10 max-w-4xl mx-auto px-6" ref={ref}>
-        <motion.div
-          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
-          initial="hidden"
-          animate={inView ? "show" : "hidden"}
-          className="space-y-12"
-        >
-          <motion.div variants={fadeUp} className="space-y-3">
-            <span className="text-xs font-mono font-medium uppercase tracking-widest px-3 py-1 rounded-full"
-              style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)" }}>
-              Experience
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
-              Where I've worked
-            </h2>
-          </motion.div>
+    <Section id="experience" tone="subtle">
+      <SectionHeading
+        eyebrow="Experience"
+        title="Where I've worked"
+        description="Research and industry roles applying machine learning to real-world problems."
+      />
 
-          <div className="relative">
-            {/* Timeline line */}
-            <div
-              className="absolute left-6 top-4 bottom-4 w-px"
-              style={{ backgroundColor: "var(--border-default)" }}
-            />
+      <ol className="space-y-5">
+        {portfolioData.experience.map((exp, i) => {
+          const [company, location] = splitCompany(exp.company);
+          const isCurrent = /present/i.test(exp.date);
 
-            <div className="space-y-8">
-              {portfolioData.experience.map((exp, i) => (
-                <motion.div key={i} variants={fadeUp} className="relative pl-16">
-                  {/* Timeline dot */}
-                  <div
-                    className="absolute left-4 top-6 w-4 h-4 rounded-full border-2 -translate-x-1/2"
-                    style={{ backgroundColor: "var(--brand-500)", borderColor: "var(--bg-secondary)" }}
-                  />
+          return (
+            <motion.li key={`${exp.role}-${exp.company}`} {...reveal(i * 0.06)}>
+              <article className="card card-hover grid gap-6 p-6 sm:p-8 md:grid-cols-[13rem_1fr] md:gap-10">
+                <div className="md:border-r md:border-line md:pr-8">
+                  <p className="font-mono text-xs text-subtle">{exp.date}</p>
+                  <p className="mt-3 font-medium text-ink">{company}</p>
+                  {location && <p className="text-sm text-muted">{location}</p>}
+                  {isCurrent && (
+                    <span className="badge mt-4">
+                      <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+                      Current role
+                    </span>
+                  )}
+                </div>
 
-                  <div
-                    className="p-6 rounded-2xl transition-all duration-200"
-                    style={{
-                      backgroundColor: "var(--surface-primary)",
-                      border: "1px solid var(--border-light)",
-                      boxShadow: "var(--shadow-sm)"
-                    }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-md)";
-                      (e.currentTarget as HTMLElement).style.borderColor = "var(--brand-300)";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-sm)";
-                      (e.currentTarget as HTMLElement).style.borderColor = "var(--border-light)";
-                    }}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-4">
-                      <div>
-                        <h3 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
-                          {exp.role}
-                        </h3>
-                        <p className="text-sm font-medium mt-0.5" style={{ color: "var(--brand-600)" }}>
-                          {exp.company}
-                        </p>
-                      </div>
-                      <span
-                        className="text-xs font-mono px-3 py-1.5 rounded-full whitespace-nowrap self-start"
-                        style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)" }}
-                      >
-                        {exp.date}
-                      </span>
-                    </div>
-                    <ul className="space-y-2">
-                      {exp.bullets.map((bullet, bi) => (
-                        <li key={bi} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                          <span className="mt-2 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: "var(--brand-400)" }} />
+                <div>
+                  <h3 className="text-xl font-semibold tracking-tight text-ink">{exp.role}</h3>
+                  <ul className="mt-4 space-y-3">
+                    {exp.bullets.map((bullet) => (
+                      <li key={bullet} className="flex gap-3 text-[15px] leading-relaxed text-muted">
+                        <span className="mt-[0.7em] h-1 w-1 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+                        <span>
                           <BoldText text={bullet} />
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </section>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            </motion.li>
+          );
+        })}
+      </ol>
+    </Section>
   );
 }

@@ -1,7 +1,6 @@
-import { useRef } from "react";
-import { motion, useInView, type Variants } from "framer-motion";
+import type { ElementType } from "react";
 import { portfolioData } from "../data/content";
-import { SkillsIllustration } from "./TechIllustrations";
+import { Reveal, Section, SectionHeading } from "./ui";
 
 // Icons
 import {
@@ -15,7 +14,7 @@ import {
 } from "react-icons/fa";
 import { VscVscode } from "react-icons/vsc";
 
-const SKILL_ICONS: Record<string, React.ElementType> = {
+const SKILL_ICONS: Record<string, ElementType> = {
   "Python": SiPython,
   "Java": FaJava,
   "C": SiC,
@@ -47,85 +46,44 @@ const SKILL_ICONS: Record<string, React.ElementType> = {
   "VS Code": VscVscode,
 };
 
-const CATEGORY_STYLE: Record<string, { bg: string; text: string; border: string }> = {
-  "Languages":       { bg: "#FFF4EE", text: "#B55336", border: "#F9CCB4" },
-  "Web Development": { bg: "#EAF4FF", text: "#1D4ED8", border: "#BFDBFE" },
-  "Databases":       { bg: "#F0FDF4", text: "#166534", border: "#BBF7D0" },
-  "ML & AI":         { bg: "#FEF9C3", text: "#854D0E", border: "#FDE68A" },
-  "Developer Tools": { bg: "#FAF5FF", text: "#7C3AED", border: "#DDD6FE" },
-};
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } }
-};
-
 export function Skills() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
   return (
-    <section id="skills" className="py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
-      <SkillsIllustration />
-      <div className="relative z-10 max-w-6xl mx-auto px-6" ref={ref}>
-        <motion.div
-          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08 } } }}
-          initial="hidden"
-          animate={inView ? "show" : "hidden"}
-          className="space-y-12"
-        >
-          <motion.div variants={fadeUp} className="text-center space-y-3">
-            <span className="text-xs font-mono font-medium uppercase tracking-widest px-3 py-1 rounded-full"
-              style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)" }}>
-              Technical Skills
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
-              What I work with
-            </h2>
-            <p className="text-base max-w-xl mx-auto" style={{ color: "var(--text-tertiary)" }}>
-              Tools and technologies I use to build and research.
-            </p>
-          </motion.div>
+    <Section id="skills" tone="subtle">
+      <SectionHeading
+        eyebrow="Skills"
+        title="Tools & technologies"
+        description="What I use to research, build and ship."
+      />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {portfolioData.skills.map((group, i) => {
-              const style = CATEGORY_STYLE[group.category] ?? { bg: "#F7F4ED", text: "#5A5A5A", border: "#E6DFD2" };
-              return (
-                <motion.div
-                  key={i}
-                  variants={fadeUp}
-                  className="p-6 rounded-2xl"
-                  style={{
-                    backgroundColor: "var(--surface-primary)",
-                    border: "1px solid var(--border-light)",
-                    boxShadow: "var(--shadow-sm)"
-                  }}
-                >
-                  <h3 className="text-sm font-semibold mb-4 uppercase tracking-wide font-mono" style={{ color: "var(--text-tertiary)" }}>
-                    {group.category}
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {group.items.map((skill, si) => {
-                      const Icon = SKILL_ICONS[skill];
-                      return (
-                        <span
-                          key={si}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-all duration-200 hover:-translate-y-0.5"
-                          style={{ backgroundColor: style.bg, color: style.text, borderColor: style.border }}
-                        >
-                          {Icon && <Icon className="w-4 h-4 shrink-0" />}
-                          {skill}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </motion.div>
-              );
-            })}
+      <Reveal className="card divide-y divide-line">
+        {portfolioData.skills.map((group) => (
+          <div
+            key={group.category}
+            className="grid gap-4 px-6 py-6 sm:px-8 md:grid-cols-[13rem_1fr] md:items-center md:gap-10"
+          >
+            <h3 className="label">{group.category}</h3>
+            <ul className="flex flex-wrap gap-2">
+              {group.items.map((skill) => {
+                const Icon = SKILL_ICONS[skill];
+                return (
+                  <li
+                    key={skill}
+                    className="group inline-flex items-center gap-2 rounded-lg border border-line bg-surface-2 px-3 py-1.5 text-sm text-ink transition-colors duration-200 hover:border-accent-line hover:bg-accent-soft"
+                  >
+                    {Icon && (
+                      <Icon
+                        className="h-4 w-4 shrink-0 text-muted transition-colors duration-200 group-hover:text-accent"
+                        aria-hidden="true"
+                      />
+                    )}
+                    {skill}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
-        </motion.div>
-      </div>
-    </section>
+        ))}
+      </Reveal>
+    </Section>
   );
 }
-

@@ -1,291 +1,143 @@
-import { useState, useEffect } from "react";
-import { motion, useReducedMotion, AnimatePresence, type Variants } from "framer-motion";
-import { GithubIcon, LinkedinIcon } from "./Icons";
-import { Mail, Download, FileText, ChevronDown } from "lucide-react";
+import { motion, type Variants } from "framer-motion";
+import { ArrowRight, FileText, GraduationCap, MapPin } from "lucide-react";
 import { portfolioData } from "../data/content";
 import harshithImg from "../assets/harshith.jpg";
-import { HeroIllustration } from "./TechIllustrations";
+import { SocialLinks } from "./ui";
 
-const NAV_LINKS = [
-  { label: "About", href: "#about" },
-  { label: "Skills", href: "#skills" },
-  { label: "Experience", href: "#experience" },
-  { label: "Projects", href: "#projects" },
-  { label: "Research", href: "#research" },
-  { label: "LeetCode", href: "#leetcode" },
-  { label: "Awards", href: "#achievements" },
-  { label: "GitHub", href: "#github" }
-];
+const container: Variants = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.05 } },
+};
 
-export function Navbar() {
-  const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return (
-    <header
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-      style={{
-        backgroundColor: scrolled ? "rgba(250,249,245,0.92)" : "transparent",
-        backdropFilter: scrolled ? "blur(16px)" : "none",
-        borderBottom: scrolled ? "1px solid var(--border-light)" : "none",
-        boxShadow: scrolled ? "var(--shadow-sm)" : "none",
-      }}
-    >
-      <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="#" className="font-bold text-lg" style={{ color: "var(--brand-600)", letterSpacing: "-0.02em" }}>
-          Harshith K T
-        </a>
-
-        <ul className="hidden md:flex items-center gap-8">
-          {NAV_LINKS.map((link) => (
-            <li key={link.href}>
-              <a
-                href={link.href}
-                className="text-sm font-medium transition-colors duration-200"
-                style={{ color: "var(--text-secondary)" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--brand-600)")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-
-        <a
-          href="https://drive.google.com/uc?export=download&id=1THzxdluLQT6cbONMZlZB3iKIewWp6N43"
-          target="_blank"
-          className="hidden md:flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-all duration-200"
-          style={{
-            backgroundColor: "var(--brand-500)",
-            color: "#fff",
-            boxShadow: "0 2px 8px rgba(217,119,87,0.35)",
-          }}
-          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "var(--brand-600)")}
-          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "var(--brand-500)")}
-        >
-          <Download className="w-4 h-4" />
-          Resume
-        </a>
-
-        <button
-          className="md:hidden p-2 rounded-md"
-          style={{ color: "var(--text-secondary)" }}
-          onClick={() => setMobileOpen(!mobileOpen)}
-          aria-label="Toggle menu"
-        >
-          <div className="w-5 h-0.5 mb-1 transition-all" style={{ backgroundColor: "currentColor", transform: mobileOpen ? "rotate(45deg) translate(4px, 4px)" : "none" }} />
-          <div className="w-5 h-0.5 mb-1 transition-all" style={{ backgroundColor: "currentColor", opacity: mobileOpen ? 0 : 1 }} />
-          <div className="w-5 h-0.5 transition-all" style={{ backgroundColor: "currentColor", transform: mobileOpen ? "rotate(-45deg) translate(4px, -4px)" : "none" }} />
-        </button>
-      </nav>
-
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden overflow-hidden"
-            style={{ backgroundColor: "var(--bg-primary)", borderBottom: "1px solid var(--border-light)" }}
-          >
-            <ul className="px-6 py-4 flex flex-col gap-4">
-              {NAV_LINKS.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="text-sm font-medium block"
-                    style={{ color: "var(--text-secondary)" }}
-                    onClick={() => setMobileOpen(false)}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </header>
-  );
-}
+const item: Variants = {
+  hidden: { opacity: 0, y: 18 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
+};
 
 export function Hero() {
-  const shouldReduceMotion = useReducedMotion();
-  const { name, contact } = portfolioData.hero;
+  const { hero, experience, research, projects } = portfolioData;
+  const [role, education] = hero.title.split(" · ");
+  const current = experience.find((exp) => /present/i.test(exp.date));
 
-  const container: Variants = {
-    hidden: {},
-    show: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } }
-  };
-
-  const item: Variants = {
-    hidden: { opacity: 0, y: 24 },
-    show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.25, 0.46, 0.45, 0.94] } }
-  };
+  const stats = [
+    ...hero.stats,
+    { value: String(research.length), label: "Research papers presented" },
+    { value: String(projects.length), label: "Projects built & shipped" },
+  ];
 
   return (
-    <section className="relative min-h-screen flex items-center pt-20" style={{ backgroundColor: "var(--bg-primary)" }}>
-      {/* Technical illustrations and gradient glow backdrops */}
-      <HeroIllustration />
+    <section id="top" className="relative isolate overflow-hidden pt-16">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
+        <div className="bg-grid absolute inset-0" />
+        <div
+          className="absolute -top-48 right-[-12%] h-[40rem] w-[40rem] rounded-full"
+          style={{ background: "radial-gradient(closest-side, var(--glow), transparent)" }}
+        />
+      </div>
 
-      <div className="relative max-w-6xl mx-auto px-6 py-20 w-full">
+      <div className="container-page">
         <motion.div
-          variants={shouldReduceMotion ? undefined : container}
-          initial={shouldReduceMotion ? false : "hidden"}
-          animate={shouldReduceMotion ? false : "show"}
-          className="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center"
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid items-center gap-14 pt-16 pb-14 md:pt-24 lg:grid-cols-[1.3fr_1fr] lg:gap-20 lg:pb-20"
         >
-          {/* Left: Text (3/5) */}
-          <div className="lg:col-span-3 space-y-8">
-            <motion.div variants={item} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium font-mono"
-              style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)" }}>
-              <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: "var(--brand-500)" }} />
-              Available for research collaborations
-            </motion.div>
-
-            <motion.div variants={item} className="space-y-3">
-              <h1 className="text-5xl md:text-6xl xl:text-7xl font-extrabold leading-[1.05] tracking-tight" style={{ color: "var(--text-primary)" }}>
-                {name.split(" ")[0]}
-                <br />
-                <span style={{ color: "var(--brand-500)" }}>{name.split(" ").slice(1).join(" ")}</span>
-              </h1>
-              <p className="text-xl font-medium max-w-xl leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                Computer Vision & Applied ML Engineer
-              </p>
-              <p className="text-base max-w-xl leading-relaxed" style={{ color: "var(--text-tertiary)" }}>
-                B.Tech (Hons.) CSE · AI & ML Major · RV University, Bengaluru
-              </p>
-            </motion.div>
-
-            <motion.p variants={item} className="text-lg leading-relaxed max-w-xl" style={{ color: "var(--text-secondary)" }}>
-              Building assistive AI systems and publishing research at IEEE venues. Ships real computer-vision systems that reach 99.48% mAP@50.
+          <div>
+            <motion.p
+              variants={item}
+              className="inline-flex items-center gap-2.5 rounded-full border border-line bg-surface/70 py-1.5 pr-4 pl-3 text-[13px] text-muted shadow-card backdrop-blur"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60 motion-reduce:hidden" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              {hero.status}
             </motion.p>
 
-            <motion.div variants={item} className="flex flex-wrap gap-3 pt-2">
-              <a
-                href="#projects"
-                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200"
-                style={{ backgroundColor: "var(--brand-500)", color: "#fff", boxShadow: "0 4px 16px rgba(217,119,87,0.4)" }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--brand-600)";
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                  e.currentTarget.style.boxShadow = "0 6px 20px rgba(217,119,87,0.5)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "var(--brand-500)";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.boxShadow = "0 4px 16px rgba(217,119,87,0.4)";
-                }}
-              >
-                View Projects
-              </a>
-              <a
-                href="#research"
-                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm border transition-all duration-200"
-                style={{ borderColor: "var(--border-strong)", color: "var(--text-secondary)", backgroundColor: "var(--surface-primary)" }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.borderColor = "var(--brand-500)";
-                  e.currentTarget.style.color = "var(--brand-600)";
-                  e.currentTarget.style.backgroundColor = "var(--brand-50)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.borderColor = "var(--border-strong)";
-                  e.currentTarget.style.color = "var(--text-secondary)";
-                  e.currentTarget.style.backgroundColor = "var(--surface-primary)";
-                }}
-              >
-                <FileText className="w-4 h-4" />
-                Read Research
-              </a>
-            </motion.div>
+            <motion.h1
+              variants={item}
+              className="mt-8 font-display text-6xl leading-[0.95] font-normal tracking-[-0.02em] text-ink sm:text-7xl lg:text-[5.75rem]"
+            >
+              {hero.name}
+            </motion.h1>
 
-            <motion.div variants={item} className="flex items-center gap-5 pt-2">
-              <a href={contact.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"
-                className="transition-transform duration-200 hover:-translate-y-0.5"
-                style={{ color: "var(--text-tertiary)" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--brand-500)")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-tertiary)")}>
-                <LinkedinIcon className="w-5 h-5" />
+            <motion.p
+              variants={item}
+              className="mt-5 text-xl font-medium tracking-tight text-balance text-accent sm:text-2xl"
+            >
+              {role}
+            </motion.p>
+
+            <motion.p variants={item} className="mt-5 max-w-xl text-lg leading-relaxed text-pretty text-muted">
+              {hero.subtext}
+            </motion.p>
+
+            {education && (
+              <motion.p variants={item} className="mt-4 flex items-start gap-2 text-sm text-subtle">
+                <GraduationCap className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
+                {education}
+              </motion.p>
+            )}
+
+            <motion.div variants={item} className="mt-9 flex flex-wrap items-center gap-3">
+              <a href="#projects" className="btn btn-primary group">
+                View my work
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </a>
-              <a href={contact.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub"
-                className="transition-transform duration-200 hover:-translate-y-0.5"
-                style={{ color: "var(--text-tertiary)" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--brand-500)")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-tertiary)")}>
-                <GithubIcon className="w-5 h-5" />
+              <a href={hero.contact.resume} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                <FileText className="h-4 w-4" />
+                View résumé
               </a>
-              <a href={`mailto:${contact.email}`} aria-label="Email"
-                className="transition-transform duration-200 hover:-translate-y-0.5"
-                style={{ color: "var(--text-tertiary)" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--brand-500)")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-tertiary)")}>
-                <Mail className="w-5 h-5" />
-              </a>
-              <span className="w-px h-4" style={{ backgroundColor: "var(--border-default)" }} />
-              <span className="text-sm" style={{ color: "var(--text-tertiary)" }}>{contact.email}</span>
+              <span className="mx-1 hidden h-6 w-px bg-line sm:block" aria-hidden="true" />
+              <SocialLinks />
             </motion.div>
           </div>
 
-          {/* Right: Image (2/5) */}
-          <motion.div variants={item} className="lg:col-span-2 flex justify-center lg:justify-end">
-            <div className="relative">
-              {/* Decorative ring */}
-              <div
-                className="absolute -inset-4 rounded-3xl rotate-2 opacity-60"
-                style={{ background: "linear-gradient(135deg, var(--brand-200), var(--brand-100))" }}
+          <motion.figure variants={item} className="relative mx-auto w-full max-w-sm lg:max-w-none">
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[1.75rem] border border-line bg-surface-2 shadow-card-hover">
+              <img
+                src={harshithImg}
+                alt={`Portrait of ${hero.name}`}
+                width={800}
+                height={800}
+                fetchPriority="high"
+                className="h-full w-full object-cover"
               />
               <div
-                className="absolute -inset-2 rounded-2xl -rotate-1 opacity-40"
-                style={{ background: "linear-gradient(135deg, var(--brand-300), transparent)" }}
+                aria-hidden="true"
+                className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 via-black/15 to-transparent"
               />
-              <div className="relative w-72 h-72 md:w-80 md:h-80 rounded-2xl overflow-hidden" style={{ boxShadow: "0 24px 48px rgba(217,119,87,0.25), 0 8px 16px rgba(0,0,0,0.08)" }}>
-                <img
-                  src={harshithImg}
-                  alt={name}
-                  className="w-full h-full object-cover object-top"
-                />
-                <div
-                  className="absolute inset-0 opacity-20"
-                  style={{ background: "linear-gradient(135deg, var(--brand-400) 0%, transparent 60%)" }}
-                />
-              </div>
-
-              {/* Floating stat cards */}
-              <div
-                className="absolute -bottom-6 -left-8 px-4 py-3 rounded-xl text-sm font-medium"
-                style={{ backgroundColor: "var(--surface-primary)", boxShadow: "var(--shadow-lg)", border: "1px solid var(--border-light)" }}
-              >
-                <div className="font-bold text-lg" style={{ color: "var(--brand-600)" }}>9.27</div>
-                <div style={{ color: "var(--text-tertiary)", fontSize: "0.75rem" }}>CGPA / 10.0</div>
-              </div>
-              <div
-                className="absolute -top-4 -right-6 px-4 py-3 rounded-xl text-sm"
-                style={{ backgroundColor: "var(--surface-primary)", boxShadow: "var(--shadow-lg)", border: "1px solid var(--border-light)" }}
-              >
-                <div className="font-bold text-lg" style={{ color: "var(--brand-600)" }}>99.48%</div>
-                <div style={{ color: "var(--text-tertiary)", fontSize: "0.75rem" }}>mAP@50</div>
-              </div>
+              {current && (
+                <figcaption className="absolute inset-x-3 bottom-3 rounded-2xl border border-white/15 bg-black/30 p-4 text-white backdrop-blur-md sm:inset-x-4 sm:bottom-4">
+                  <p className="flex items-center gap-2 font-mono text-[10px] tracking-[0.16em] text-white/70 uppercase">
+                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" aria-hidden="true" />
+                    Currently
+                  </p>
+                  <p className="mt-1.5 text-[15px] leading-snug font-medium">{current.role}</p>
+                  <p className="text-sm text-white/75">{current.company.split(",")[0]}</p>
+                </figcaption>
+              )}
             </div>
-          </motion.div>
+            <p className="absolute top-4 -left-3 inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink shadow-card-hover sm:-left-5">
+              <MapPin className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
+              {hero.location}
+            </p>
+          </motion.figure>
         </motion.div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2, duration: 0.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        <motion.dl
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          className="mb-20 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line shadow-card md:mb-24 md:grid-cols-4"
         >
-          <span className="text-xs font-medium" style={{ color: "var(--text-tertiary)" }}>Scroll</span>
-          <ChevronDown className="w-4 h-4 animate-bounce" style={{ color: "var(--brand-400)" }} />
-        </motion.div>
+          {stats.map((stat) => (
+            <div key={stat.label} className="flex flex-col-reverse justify-end gap-1 bg-surface px-5 py-5 sm:px-7 sm:py-6">
+              <dt className="text-[13px] leading-snug text-muted">{stat.label}</dt>
+              <dd className="text-2xl font-semibold tracking-tight text-ink tabular-nums sm:text-3xl">{stat.value}</dd>
+            </div>
+          ))}
+        </motion.dl>
       </div>
     </section>
   );

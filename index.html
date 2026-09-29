@@ -3,16 +3,40 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Harshith KT — AI & ML Engineer & MERN Stack Developer</title>
   <meta name="description"
     content="Harshith KT — AI & ML Engineer & MERN Stack Developer. B.Tech (Hons.) CSE at RV University, Bengaluru. Building assistive AI systems and publishing research at IEEE venues." />
+  <meta name="author" content="Harshith KT" />
+  <meta name="theme-color" content="#faf9f6" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Harshith KT — AI & ML Engineer & MERN Stack Developer" />
+  <meta property="og:description"
+    content="Building assistive AI systems and publishing research at IEEE venues. Projects, research, and experience." />
+  <meta name="twitter:card" content="summary" />
+
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@100..900&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:opsz,wght@14..32,100..900&family=JetBrains+Mono:wght@400;500&display=swap"
     rel="stylesheet">
-  <title>Harshith KT — AI & ML Engineer & MERN Stack Developer</title>
+
+  <!-- Resolve the colour theme before first paint so dark-mode visitors never see a light flash -->
+  <script>
+    (function () {
+      var theme = null;
+      try { theme = localStorage.getItem("theme"); } catch (e) {}
+      if (theme !== "light" && theme !== "dark") {
+        theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+      }
+      document.documentElement.dataset.theme = theme;
+      if (theme === "dark") {
+        document.querySelector('meta[name="theme-color"]').setAttribute("content", "#121110");
+      }
+    })();
+  </script>
 </head>
 
 <body>

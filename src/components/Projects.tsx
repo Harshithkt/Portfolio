@@ -1,209 +1,188 @@
-import { useRef } from "react";
-import { motion, useInView, type Variants } from "framer-motion";
-import { GithubIcon } from "./Icons";
+import { useId, useRef, useState } from "react";
+import { flushSync } from "react-dom";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowUpRight, ChevronDown } from "lucide-react";
+import { FaGithub } from "react-icons/fa";
 import { portfolioData } from "../data/content";
+import { cn } from "../utils/cn";
+import { reveal } from "../utils/motion";
 import { BoldText } from "./BoldText";
-import { ProjectsIllustration } from "./TechIllustrations";
+import { Section, SectionHeading } from "./ui";
 
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } }
-};
+type Project = (typeof portfolioData.projects)[number];
+
+const INITIAL_VISIBLE = 6;
+const TECH_VISIBLE = 6;
+
+// Featured first, otherwise keep the order from content.ts
+const ORDERED_PROJECTS = [
+  ...portfolioData.projects.filter((p) => p.featured),
+  ...portfolioData.projects.filter((p) => !p.featured),
+];
 
 export function Projects() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const [showAll, setShowAll] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const visible = showAll ? ORDERED_PROJECTS : ORDERED_PROJECTS.slice(0, INITIAL_VISIBLE);
+  const hiddenCount = ORDERED_PROJECTS.length - INITIAL_VISIBLE;
+
+  const toggle = () => {
+    if (!showAll) {
+      setShowAll(true);
+      return;
+    }
+    // Collapsing removes a lot of height above the button — keep it in view
+    flushSync(() => setShowAll(false));
+    toggleRef.current?.scrollIntoView({ block: "center" });
+  };
 
   return (
-    <section id="projects" className="py-28" style={{ backgroundColor: "var(--bg-primary)" }}>
-      <ProjectsIllustration />
-      <div className="relative z-10 max-w-6xl mx-auto px-6" ref={ref}>
-        <motion.div
-          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
-          initial="hidden"
-          animate={inView ? "show" : "hidden"}
-          className="space-y-12"
-        >
-          <motion.div variants={fadeUp} className="text-center space-y-3">
-            <span className="text-xs font-mono font-medium uppercase tracking-widest px-3 py-1 rounded-full"
-              style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)" }}>
-              Projects
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
-              Things I've built
-            </h2>
-          </motion.div>
+    <Section id="projects">
+      <SectionHeading
+        eyebrow="Projects"
+        title="Things I've built"
+        description="AI systems, autonomous agents and full-stack products — from multi-agent RAG to assistive computer vision."
+        action={
+          <a
+            href={portfolioData.hero.contact.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn btn-secondary group"
+          >
+            <FaGithub className="h-4 w-4" aria-hidden="true" />
+            All repositories
+            <ArrowUpRight className="h-3.5 w-3.5 text-subtle transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </a>
+        }
+      />
 
-          {/* Featured project */}
-          {portfolioData.projects.filter(p => p.featured).map((project, i) => (
-            <motion.div
-              key={i}
-              variants={fadeUp}
-              className="relative overflow-hidden rounded-3xl p-8 md:p-12 transition-all duration-300"
-              style={{
-                background: "linear-gradient(135deg, var(--brand-500) 0%, var(--brand-700) 100%)",
-                boxShadow: "0 20px 60px rgba(217,119,87,0.35)"
-              }}
-            >
-              {/* Background pattern */}
-              <div className="absolute inset-0 opacity-10">
-                <div className="absolute top-8 right-8 w-64 h-64 rounded-full border-2 border-white" />
-                <div className="absolute top-20 right-20 w-40 h-40 rounded-full border border-white" />
-                <div className="absolute -bottom-10 -left-10 w-80 h-80 rounded-full border-2 border-white" />
-              </div>
+      <ul className="grid gap-5 md:grid-cols-2">
+        {visible.map((project) => (
+          <ProjectCard key={project.title} project={project} />
+        ))}
+      </ul>
 
-              <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-mono px-2.5 py-1 rounded-md font-medium" style={{ backgroundColor: "rgba(255,255,255,0.2)", color: "#fff" }}>
-                        ⭐ Featured
-                      </span>
-                      <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.75)" }}>{project.year}</span>
-                    </div>
-                    {project.github && (
-                      <a
-                        href={project.github}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium transition-all duration-200 shadow-sm"
-                        style={{
-                          backgroundColor: "rgba(255, 255, 255, 0.2)",
-                          color: "#FFFFFF",
-                          border: "1px solid rgba(255, 255, 255, 0.35)",
-                          backdropFilter: "blur(6px)"
-                        }}
-                        onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(255, 255, 255, 0.35)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "rgba(255, 255, 255, 0.6)";
-                          (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLElement).style.backgroundColor = "rgba(255, 255, 255, 0.2)";
-                          (e.currentTarget as HTMLElement).style.borderColor = "rgba(255, 255, 255, 0.35)";
-                          (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-                        }}
-                      >
-                        <GithubIcon className="w-4 h-4 text-white" />
-                        <span>Code</span>
-                      </a>
-                    )}
-                  </div>
-                  <h3 className="text-2xl md:text-3xl font-bold text-white leading-tight">{project.title}</h3>
-                  <ul className="space-y-3">
-                    {project.bullets.map((bullet, bi) => (
-                      <li key={bi} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: "rgba(255,255,255,0.85)" }}>
-                        <span className="mt-2 w-1.5 h-1.5 rounded-full shrink-0 bg-white opacity-70" />
-                        <BoldText text={bullet} />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="space-y-6">
-                  <div className="flex flex-wrap gap-2">
-                    {project.tech.map((t, ti) => (
-                      <span key={ti} className="text-xs font-mono px-3 py-1.5 rounded-lg"
-                        style={{ backgroundColor: "rgba(255,255,255,0.15)", color: "#fff" }}>
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                  {project.metrics && (
-                    <div className="space-y-3">
-                      <p className="text-xs font-mono uppercase tracking-wide" style={{ color: "rgba(255,255,255,0.6)" }}>
-                        Model Performance
-                      </p>
-                      <div className="grid grid-cols-2 gap-3">
-                        {project.metrics.map((m, mi) => (
-                          <div key={mi} className="p-4 rounded-xl" style={{ backgroundColor: "rgba(255,255,255,0.12)", backdropFilter: "blur(8px)" }}>
-                            <div className="text-2xl font-bold text-white">{m.value}</div>
-                            <div className="text-xs mt-1" style={{ color: "rgba(255,255,255,0.7)" }}>{m.label}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
+      {hiddenCount > 0 && (
+        <div className="mt-12 flex justify-center">
+          <button ref={toggleRef} type="button" onClick={toggle} aria-expanded={showAll} className="btn btn-secondary">
+            {showAll ? "Show fewer projects" : `Show ${hiddenCount} more projects`}
+            <ChevronDown className={cn("h-4 w-4 transition-transform duration-300", showAll && "rotate-180")} />
+          </button>
+        </div>
+      )}
+    </Section>
+  );
+}
 
-          {/* Other projects */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {portfolioData.projects.filter(p => !p.featured).map((project, i) => (
-              <motion.div
-                key={i}
-                variants={fadeUp}
-                className="group relative flex flex-col p-7 rounded-2xl transition-all duration-300"
-                style={{
-                  backgroundColor: "var(--surface-primary)",
-                  border: "1px solid var(--border-light)",
-                  boxShadow: "var(--shadow-sm)"
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-lg)";
-                  (e.currentTarget as HTMLElement).style.borderColor = "var(--brand-300)";
-                  (e.currentTarget as HTMLElement).style.transform = "translateY(-4px)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-sm)";
-                  (e.currentTarget as HTMLElement).style.borderColor = "var(--border-light)";
-                  (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-                }}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <div>
-                    <span className="text-xs font-mono" style={{ color: "var(--text-tertiary)" }}>{project.year}</span>
-                    <h3 className="text-lg font-bold mt-1 group-hover:text-[var(--brand-600)] transition-colors" style={{ color: "var(--text-primary)" }}>
-                      {project.title}
-                    </h3>
-                  </div>
-                  {project.github && (
-                    <a href={project.github} target="_blank" rel="noopener noreferrer"
-                      className="p-2 rounded-lg transition-all duration-200"
-                      style={{ color: "var(--text-tertiary)" }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--brand-600)"; (e.currentTarget as HTMLElement).style.backgroundColor = "var(--brand-50)"; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = "var(--text-tertiary)"; (e.currentTarget as HTMLElement).style.backgroundColor = "transparent"; }}>
-                      <GithubIcon className="w-5 h-5" />
-                    </a>
-                  )}
-                </div>
+function ProjectCard({ project }: { project: Project }) {
+  const [expanded, setExpanded] = useState(false);
+  const panelId = useId();
 
-                <div className="flex flex-wrap gap-2 mb-5">
-                  {project.tech.map((t, ti) => (
-                    <span key={ti} className="text-xs font-mono px-2 py-1 rounded-md"
-                      style={{ backgroundColor: "var(--bg-tertiary)", color: "var(--text-secondary)", border: "1px solid var(--border-light)" }}>
-                      {t}
-                    </span>
-                  ))}
-                </div>
+  // "PharmacoRAG — Multi-Agent ..." -> name + tagline
+  const [name, ...rest] = project.title.split(" — ");
+  const tagline = rest.join(" — ");
+  const [summary, ...highlights] = project.bullets;
+  const metrics = project.metrics?.slice(0, 3) ?? [];
+  // Some entries point at the profile as a placeholder; only link real repositories
+  const repoUrl = project.github && project.github !== portfolioData.hero.contact.github ? project.github : null;
+  const extraTech = project.tech.length - TECH_VISIBLE;
 
-                <ul className="space-y-2.5 flex-1 mb-5">
-                  {project.bullets.map((bullet, bi) => (
-                    <li key={bi} className="flex items-start gap-3 text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                      <span className="mt-2 w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: "var(--brand-400)" }} />
-                      <BoldText text={bullet} />
-                    </li>
-                  ))}
-                </ul>
-
-                {project.metrics && project.metrics.length > 0 && (
-                  <div className="flex flex-wrap gap-2 pt-4 border-t" style={{ borderColor: "var(--border-light)" }}>
-                    {project.metrics.map((m, mi) => (
-                      <div key={mi} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono"
-                        style={{ backgroundColor: "var(--brand-50)", border: "1px solid var(--brand-200)", color: "var(--brand-700)" }}>
-                        <span className="font-bold">{m.value}</span>
-                        <span style={{ color: "var(--brand-500)" }}>·</span>
-                        <span>{m.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
+  return (
+    <motion.li {...reveal()} className="card card-hover group flex flex-col p-6 sm:p-7">
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0">
+          <p className="flex items-center gap-2 font-mono text-xs text-subtle">
+            <span>{project.year}</span>
+            {project.featured && (
+              <>
+                <span aria-hidden="true">·</span>
+                <span className="text-accent">Featured</span>
+              </>
+            )}
+          </p>
+          <h3 className="mt-2 text-xl font-semibold tracking-tight text-ink">{name}</h3>
+          {tagline && <p className="mt-1 text-sm leading-snug text-muted">{tagline}</p>}
+        </div>
+        {repoUrl && (
+          <a
+            href={repoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`${name} source code on GitHub`}
+            title="View source on GitHub"
+            className="icon-btn"
+          >
+            <FaGithub className="h-[18px] w-[18px]" aria-hidden="true" />
+          </a>
+        )}
       </div>
-    </section>
+
+      <p className="mt-4 text-[15px] leading-relaxed text-pretty text-muted">
+        <BoldText text={summary} />
+      </p>
+
+      {metrics.length > 0 && (
+        <dl
+          className="mt-5 grid divide-x divide-line overflow-hidden rounded-xl border border-line bg-surface-2"
+          style={{ gridTemplateColumns: `repeat(${metrics.length}, minmax(0, 1fr))` }}
+        >
+          {metrics.map((metric) => (
+            <div key={metric.label} className="flex flex-col-reverse justify-end gap-1 px-3.5 py-3">
+              <dt className="text-[11px] leading-snug text-subtle">{metric.label}</dt>
+              <dd className="text-[15px] leading-tight font-semibold text-ink tabular-nums">{metric.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      {highlights.length > 0 && (
+        <div className="mt-4">
+          <button
+            type="button"
+            onClick={() => setExpanded((open) => !open)}
+            aria-expanded={expanded}
+            aria-controls={panelId}
+            className="inline-flex items-center gap-1 rounded text-sm font-medium text-accent transition-colors hover:text-accent-hover"
+          >
+            {expanded ? "Hide highlights" : "Key highlights"}
+            <ChevronDown className={cn("h-4 w-4 transition-transform duration-300", expanded && "rotate-180")} />
+          </button>
+          <AnimatePresence initial={false}>
+            {expanded && (
+              <motion.ul
+                id={panelId}
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+              >
+                {highlights.map((bullet) => (
+                  <li key={bullet} className="flex gap-3 pt-3 text-sm leading-relaxed text-muted">
+                    <span className="mt-[0.65em] h-1 w-1 shrink-0 rounded-full bg-accent" aria-hidden="true" />
+                    <span>
+                      <BoldText text={bullet} />
+                    </span>
+                  </li>
+                ))}
+              </motion.ul>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      <ul className="mt-auto flex flex-wrap gap-1.5 pt-6" aria-label="Tech stack">
+        {project.tech.slice(0, TECH_VISIBLE).map((tech) => (
+          <li key={tech} className="chip">
+            {tech}
+          </li>
+        ))}
+        {extraTech > 0 && (
+          <li className="chip" title={project.tech.slice(TECH_VISIBLE).join(", ")}>
+            +{extraTech}
+          </li>
+        )}
+      </ul>
+    </motion.li>
   );
 }

@@ -5,7 +5,7 @@ const KEYWORDS = [
   // Metrics & numbers
   "99.48% mAP@50", "100% mAP@50", "99.7% accuracy", "99.4%", "9.38/10.0", "CGPA 9.38", "mAP@50",
   "< 3 seconds", "< 3s", "50 tokens/sec", "5x faster", "99.7%", "9 languages",
-  "top 14 of 550+", "top 30 of 760+", "1,312 annotated images", "5 real-time streams",
+  "top 14 of 550+", "top 30 of 760+", "20,000+ registrations", "1,312 annotated images", "5 real-time streams",
   "5 live data streams", "5 data streams",
 
   // Flagship tech
@@ -42,10 +42,12 @@ const KEYWORDS = [
   "one-tap", "emergency", "Emergency", "SOS",
 ];
 
-// Build a single regex from the keyword list (escape special chars)
+// Build a single regex from the keyword list (escape special chars). Sorting
+// longest-first makes "IEEE RVU Communications Society" win over "IEEE".
 const escapeRegex = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const KEYWORD_SET = new Set(KEYWORDS);
 const KEYWORD_REGEX = new RegExp(
-  `(${KEYWORDS.map(escapeRegex).join("|")})`,
+  `(${[...KEYWORD_SET].sort((a, b) => b.length - a.length).map(escapeRegex).join("|")})`,
   "g"
 );
 
@@ -60,8 +62,8 @@ export function BoldText({ text, className }: BoldTextProps) {
   return (
     <span className={className}>
       {parts.map((part, i) =>
-        KEYWORDS.includes(part) ? (
-          <strong key={i} style={{ fontWeight: 600, color: "inherit" }}>
+        KEYWORD_SET.has(part) ? (
+          <strong key={i} className="font-medium text-ink">
             {part}
           </strong>
         ) : (

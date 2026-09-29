@@ -1,117 +1,55 @@
-import { useRef } from "react";
-import { motion, useInView, type Variants } from "framer-motion";
+import { motion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 import { portfolioData } from "../data/content";
+import { reveal } from "../utils/motion";
 import { BoldText } from "./BoldText";
-import { ResearchIllustration } from "./TechIllustrations";
-import { ExternalLinkIcon } from "./Icons";
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: "easeOut" } }
-};
+import { Section, SectionHeading } from "./ui";
 
 export function Research() {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
   return (
-    <section id="research" className="py-28" style={{ backgroundColor: "var(--bg-secondary)" }}>
-      <ResearchIllustration />
-      <div className="relative z-10 max-w-5xl mx-auto px-6" ref={ref}>
-        <motion.div
-          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.1 } } }}
-          initial="hidden"
-          animate={inView ? "show" : "hidden"}
-          className="space-y-12"
-        >
-          <motion.div variants={fadeUp} className="space-y-3">
-            <span className="text-xs font-mono font-medium uppercase tracking-widest px-3 py-1 rounded-full"
-              style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)" }}>
-              Research
-            </span>
-            <h2 className="text-3xl md:text-4xl font-bold" style={{ color: "var(--text-primary)" }}>
-              Publications & Presentations
-            </h2>
-            <p className="text-base" style={{ color: "var(--text-tertiary)" }}>
-              Peer-reviewed work presented at international IEEE conferences.
-            </p>
-          </motion.div>
+    <Section id="research" tone="subtle">
+      <SectionHeading
+        eyebrow="Research"
+        title="Publications & presentations"
+        description="Peer-reviewed work presented at international conferences."
+      />
 
-          <div className="space-y-5">
-            {portfolioData.research.map((pub, i) => (
-              <motion.div
-                key={i}
-                variants={fadeUp}
-                className="flex flex-col md:flex-row md:items-center gap-6 p-7 rounded-2xl transition-all duration-300"
-                style={{
-                  backgroundColor: "var(--surface-primary)",
-                  border: "1px solid var(--border-light)",
-                  boxShadow: "var(--shadow-sm)"
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-md)";
-                  (e.currentTarget as HTMLElement).style.borderColor = "var(--brand-300)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-sm)";
-                  (e.currentTarget as HTMLElement).style.borderColor = "var(--border-light)";
-                }}
-              >
-                {/* Number badge */}
-                <div
-                  className="shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold self-start"
-                  style={{ background: "linear-gradient(135deg, var(--brand-400), var(--brand-600))", color: "#fff" }}
+      <ol className="space-y-5">
+        {portfolioData.research.map((pub, i) => (
+          <motion.li key={pub.venue} {...reveal(i * 0.06)}>
+            <article className="card card-hover grid gap-5 p-6 sm:p-8 md:grid-cols-[auto_1fr_auto] md:gap-8">
+              <span className="font-mono text-sm text-subtle tabular-nums">{String(i + 1).padStart(2, "0")}</span>
+
+              <div>
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                  <h3 className="text-lg font-semibold tracking-tight text-ink">{pub.venue}</h3>
+                  {pub.badges.map((badge) => (
+                    <span key={badge} className="badge">
+                      {badge}
+                    </span>
+                  ))}
+                </div>
+                <p className="mt-1.5 text-sm font-medium text-accent">{pub.role}</p>
+                <p className="mt-4 max-w-3xl text-[15px] leading-relaxed text-muted">
+                  <BoldText text={pub.description} />
+                </p>
+              </div>
+
+              {pub.url && (
+                <a
+                  href={pub.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary btn-sm group self-start"
                 >
-                  {i + 1}
-                </div>
-
-                <div className="flex-1 space-y-3">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <h3 className="text-lg font-bold" style={{ color: "var(--text-primary)" }}>
-                        {pub.venue}
-                      </h3>
-                      {pub.badges.map((badge, bi) => (
-                        <span key={bi} className="text-xs font-mono px-2.5 py-1 rounded-full"
-                          style={{ backgroundColor: "var(--brand-100)", color: "var(--brand-700)", border: "1px solid var(--brand-200)" }}>
-                          {badge}
-                        </span>
-                      ))}
-                    </div>
-                    {pub.url && (
-                      <a
-                        href={pub.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-mono font-medium transition-all duration-200"
-                        style={{
-                          backgroundColor: "var(--brand-500)",
-                          color: "#ffffff"
-                        }}
-                        onMouseEnter={(e) => {
-                          (e.currentTarget as HTMLElement).style.backgroundColor = "var(--brand-600)";
-                          (e.currentTarget as HTMLElement).style.transform = "translateY(-1px)";
-                        }}
-                        onMouseLeave={(e) => {
-                          (e.currentTarget as HTMLElement).style.backgroundColor = "var(--brand-500)";
-                          (e.currentTarget as HTMLElement).style.transform = "translateY(0)";
-                        }}
-                      >
-                        <ExternalLinkIcon className="w-3.5 h-3.5" />
-                        <span>View Paper</span>
-                      </a>
-                    )}
-                  </div>
-                  <p className="text-sm font-medium" style={{ color: "var(--brand-600)" }}>{pub.role}</p>
-                  <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
-                    <BoldText text={pub.description} />
-                  </p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </div>
-    </section>
+                  View paper
+                  <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </a>
+              )}
+            </article>
+          </motion.li>
+        ))}
+      </ol>
+    </Section>
   );
 }

@@ -3,10 +3,18 @@ export const portfolioData = {
     name: "Harshith KT",
     title: "AI & ML Engineer & MERN Stack Developer · B.Tech (Hons.) CSE, RV University, Bengaluru",
     subtext: "Building assistive AI systems and publishing research at IEEE venues.",
+    status: "Open to research collaborations & internships",
+    location: "Bengaluru, India",
+    // Shown in the hero stat strip; paper and project counts are derived from the lists below
+    stats: [
+      { value: "9.27", label: "CGPA out of 10" },
+      { value: "Top 14", label: "of 550+ students" },
+    ],
     contact: {
       email: "harshithkt06@gmail.com",
       linkedin: "https://linkedin.com/in/harshith-kt",
       github: "https://github.com/Harshithkt",
+      resume: "https://drive.google.com/file/d/1IuDHg08ePrF2nX5-a8A2jyBYFwTIv1c9/view?usp=sharing",
     }
   },
   about: {
@@ -15,6 +23,29 @@ export const portfolioData = {
       "CGPA 9.27/10.0; Merit Scholarship recipient, ranked top 14 of 550+ students.",
       "Chair of the IEEE RVU Communications Society, leading technical workshops, hackathons, and student engagement.",
       "Currently a Research & Development Intern with the IEEE Bangalore Section."
+    ],
+    // icon: one of "vision" | "agents" | "fullstack" | "research"
+    focus: [
+      {
+        icon: "vision",
+        title: "Computer Vision",
+        description: "Robust detection models for assistive tech, benchmarked under real-world degradations."
+      },
+      {
+        icon: "agents",
+        title: "LLM & Agentic Systems",
+        description: "Multi-agent RAG pipelines and autonomous agents with grounded, cited answers."
+      },
+      {
+        icon: "fullstack",
+        title: "Full-stack Products",
+        description: "End-to-end apps with React, Node.js, FastAPI and SQL / NoSQL databases."
+      },
+      {
+        icon: "research",
+        title: "Applied Research",
+        description: "Peer-reviewed work on anomaly detection, medical imaging and model robustness."
+      }
     ]
   },
   skills: [
@@ -63,7 +94,7 @@ export const portfolioData = {
     {
       role: "Research & Development Intern",
       company: "IEEE Bangalore Section, Bengaluru",
-      date: "Jan 2025 – Present",
+      date: "Apr 2026 – Sept 2026",
       bullets: [
         "Researching the robustness of YOLOv8 and Faster R-CNN for assistive currency recognition under real-world visual degradations.",
         "Conducted literature review on object detection, robustness benchmarking, model calibration, and currency recognition systems.",
@@ -339,6 +370,12 @@ export const portfolioData = {
   ],
   achievements: [
     {
+      title: "Reviewer, IEEE ICAIMS 2026",
+      date: "July 2026",
+      description: "Served as a reviewer for the IEEE International Conference on Adaptive Intelligence, Modeling and Simulation, held in Kota Kinabalu, Sabah, Malaysia (28–30 July 2026).",
+      featured: true
+    },
+    {
       title: "IEEE WIE Big Idea Pitch Competition 2026",
       date: "July 2026",
       description: "Finalist in the Best Impact Pitch category for Pharmaco, an AI-powered drug safety reporting platform",
@@ -348,6 +385,12 @@ export const portfolioData = {
       title: "Buildathon Organised By RVCE",
       date: "20th June 2026",
       description: "Secured 1st place among 31 teams in a buildathon organised by RVCE",
+      featured: true
+    },
+    {
+      title: "Odoo Hackathon Finalist",
+      date: "",
+      description: "Selected as a finalist from 20,000+ registrations.",
       featured: true
     },
     {
