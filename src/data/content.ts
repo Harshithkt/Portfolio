@@ -115,23 +115,6 @@ export const portfolioData = {
   ],
   projects: [
     {
-      title: "Fine-Grained Vehicle Recognition — Make, Model & Year from a Photo",
-      year: "2026",
-      tech: ["Python", "PyTorch", "ConvNeXt", "YOLOv8", "OpenCV", "ONNX Runtime", "FastAPI", "React", "Modal"],
-      bullets: [
-        "Hybrid computer-vision system that identifies the make, model and year of a car from one photo across 1,291 car generations (1948–2026), served as a FastAPI + React web app with a live demo on Modal.",
-        "Combined YOLOv8 detection (mAP@0.5 0.990), ConvNeXt classifiers and classical features (HOG, LBP, colour, geometry) with temperature-calibrated confidence: ECE fell from 10.4% to 0.2%, and confident decisions were 99.1% correct.",
-        "Reached 94.4% exact accuracy on 19,112 unseen photos (94.7% on the Stanford Cars benchmark); ONNX INT8 cut the model from 115 MB to 35 MB and halved CPU latency, after training on one H100 for $5.74.",
-      ],
-      metrics: [
-        { label: "Exact accuracy (19,112 unseen)", value: "94.4%" },
-        { label: "Calibration error (ECE)", value: "10.4% → 0.2%" },
-        { label: "Car generations", value: "1,291" }
-      ],
-      featured: true,
-      github: "https://github.com/Harshithkt/car-evals"
-    },
-    {
       title: "LegalLens AI — Cross-Lingual Legal Question Answering",
       year: "2026",
       tech: ["Python", "LangGraph", "FastAPI", "ChromaDB", "BM25", "bge-m3", "React", "TypeScript", "Express", "Docker"],
@@ -147,6 +130,23 @@ export const portfolioData = {
       ],
       featured: true,
       github: "https://github.com/Harshithkt/LEGAL-NLP"
+    },
+    {
+      title: "Fine-Grained Vehicle Recognition — Make, Model & Year from a Photo",
+      year: "2026",
+      tech: ["Python", "PyTorch", "ConvNeXt", "YOLOv8", "OpenCV", "ONNX Runtime", "FastAPI", "React", "Modal"],
+      bullets: [
+        "Hybrid computer-vision system that identifies the make, model and year of a car from one photo across 1,291 car generations (1948–2026), served as a FastAPI + React web app with a live demo on Modal.",
+        "Combined YOLOv8 detection (mAP@0.5 0.990), ConvNeXt classifiers and classical features (HOG, LBP, colour, geometry) with temperature-calibrated confidence: ECE fell from 10.4% to 0.2%, and confident decisions were 99.1% correct.",
+        "Reached 94.4% exact accuracy on 19,112 unseen photos (94.7% on the Stanford Cars benchmark); ONNX INT8 cut the model from 115 MB to 35 MB and halved CPU latency, after training on one H100 for $5.74.",
+      ],
+      metrics: [
+        { label: "Exact accuracy (19,112 unseen)", value: "94.4%" },
+        { label: "Calibration error (ECE)", value: "10.4% → 0.2%" },
+        { label: "Car generations", value: "1,291" }
+      ],
+      featured: true,
+      github: "https://github.com/Harshithkt/car-evals"
     },
     {
       title: "PharmacoRAG — Multi-Agent Pharmacovigilance Intelligence System",
